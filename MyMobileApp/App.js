@@ -1,20 +1,50 @@
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
+// Import our screen components
+import PreviousWorkouts from './screens/PreviousWorkouts';
+import StartWorkout from './screens/StartWorkout';
+import GymBuddy from './screens/GymBuddy';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === 'Previous Workouts') {
+              iconName = focused ? 'list' : 'list-outline';
+            } else if (route.name === 'Start Workout') {
+              iconName = focused ? 'play-circle' : 'play-circle-outline';
+            } else if (route.name === 'GYM Buddy') {
+              iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: '#007AFF',
+          tabBarInactiveTintColor: 'gray',
+          headerStyle: {
+            backgroundColor: '#007AFF',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        })}
+      >
+        <Tab.Screen name="Previous Workouts" component={PreviousWorkouts} />
+        <Tab.Screen name="Start Workout" component={StartWorkout} />
+        <Tab.Screen name="GYM Buddy" component={GymBuddy} />
+      </Tab.Navigator>
+      <StatusBar style="light" />
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
