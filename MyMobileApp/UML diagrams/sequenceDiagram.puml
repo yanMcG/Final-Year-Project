@@ -1,0 +1,32 @@
+@startuml
+title Sequence Diagram: Fitbit API → AI API → Firebase (Using Coding ID)
+
+actor User
+
+participant "CodingID" as CID
+participant "App" as APP
+participant "Fitbit API" as FITBIT
+participant "AI API" as AI
+participant "Firebase Database" as FIREBASE
+
+' ======================
+' SEQUENCE FLOW
+' ======================
+
+User -> APP: Start Sync Process
+
+APP -> CID: Request Coding ID
+CID --> APP: Return codingID
+
+APP -> FITBIT: Request heart rate and steps
+FITBIT --> APP: Send Fitbit data (HR, steps)
+
+APP -> AI: Send data + codingID\nfor analysis or recommendation
+AI --> APP: Return AI insights/results
+
+APP -> FIREBASE: Save Fitbit + AI data\nunder codingID
+FIREBASE --> APP: Confirm save
+
+APP -> User: Show success message
+
+@enduml
