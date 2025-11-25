@@ -1,0 +1,23 @@
+' alt + d
+' use case code for a workout storage system in a mobile app
+
+@startuml
+left to right direction
+
+actor "App" as App
+actor "Firebase Database" as DB
+
+rectangle "Workout Storage System" {
+    usecase "Input Workout Data" as UC_Input
+    usecase "Store Workout Data in Firebase" as UC_Store
+    usecase "Retrieve Workout Data" as UC_Retrieve
+}
+
+App --> UC_Input
+App --> UC_Retrieve
+
+UC_Input --> UC_Store : Send exercise, sets, reps, duration
+UC_Store --> DB : Save workout document
+UC_Retrieve --> DB : Fetch workout records
+
+@enduml

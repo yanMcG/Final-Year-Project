@@ -1,0 +1,60 @@
+@startuml
+skinparam classAttributeIconSize 0
+title Minimal Architecture: Fitbit + AI API + Firebase + Coding ID
+
+' ========================
+' Local App Identity
+' ========================
+class CodingID {
+    + id : String
+}
+
+' ========================
+' External Services
+' ========================
+class "Firebase Database" as Firebase {
+    + storeWorkoutData(data)
+    + getWorkoutData()
+}
+
+class "Fitbit API" as FitbitAPI {
+    + GET /user/heart-rate
+    + GET /user/steps
+}
+
+class "Open-Source AI API" as AIAPI {
+    + POST /analyze
+    + POST /generate
+}
+
+' ========================
+' Local App Modules
+' ========================
+class FitbitModule {
+    + fetchFitbitData()
+}
+
+class AImodule {
+    + sendDataToAI(data)
+}
+
+class FirebaseModule {
+    + saveToFirebase(data)
+    + loadFromFirebase()
+}
+
+' ========================
+' Relationships
+' ========================
+
+' Coding ID used across modules
+CodingID --> FitbitModule : identify requests >
+CodingID --> AImodule : tag data >
+CodingID --> FirebaseModule : store under ID >
+
+' Local modules --> external APIs
+FitbitModule --> FitbitAPI : fetch health data >
+AImodule --> AIAPI : send workout info >
+FirebaseModule --> Firebase : save/load data >
+
+@enduml
