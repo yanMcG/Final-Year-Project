@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 
 export default function GymBuddy() {
   const [messages, setMessages] = useState([
@@ -7,6 +7,12 @@ export default function GymBuddy() {
     { id: 2, text: "I can help you with workout tips, form guidance, and motivation!", isBot: true },
   ]);
   const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Ollama API Configuration
+  //PC Ip 172.16.18.2
+  const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
+  const OLLAMA_MODEL = 'gemma2:2b'; // Your installed model
 
   const quickTips = [
     "What's a good warm-up routine?",
@@ -15,8 +21,57 @@ export default function GymBuddy() {
     "Motivate me!",
   ];
 
-  const sendMessage = (text) => {
-    if (!text.trim()) return;
+  const callOllamaAPI = async (userMessage) => {
+    try {
+      const response = await fetch(OLLAMA_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: OLLAMA_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful and motivating gym buddy assistant. Provide concise, practical workout advice, form tips, and motivation. Keep responses short and energetic with emojis.',
+            },
+            {
+              role: 'user',
+              content: userMessage,
+            },
+          ],
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ollama API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.message?.content || "I'm here to help! 💪";
+    } catch (error) {
+      console.error('Ollama API Error:', error);
+      return getFallbackResponse(userMessage);
+    }
+  };
+
+  const getFallbackResponse = (text) => {
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes('warm-up')) {
+      return "Great warm-up: 5-10 min light cardio, dynamic stretches, and bodyweight movements like arm circles and leg swings! 🔥";
+    } else if (lowerText.includes('reps')) {
+      return "For beginners: 8-12 reps for strength, 12-15 for endurance. Listen to your body! 💪";
+    } else if (lowerText.includes('beginner')) {
+      return "Perfect beginner exercises: Push-ups, squats, planks, and walking! Start slow and build up gradually. You've got this! 🌟";
+    } else if (lowerText.includes('motivate')) {
+      return "You're stronger than you think! Every workout counts, every rep matters. Your future self will thank you! Let's go! 🚀💪";
+    }
+    return "That's a great question! Keep pushing yourself! 💪";
+  };
+
+  const sendMessage = async (text) => {
+    if (!text.trim() || isLoading) return;
 
     const newUserMessage = {
       id: messages.length + 1,
@@ -24,17 +79,11 @@ export default function GymBuddy() {
       isBot: false,
     };
 
-    let botResponse = "That's a great question! Keep pushing yourself! 💪";
-    
-    if (text.toLowerCase().includes('warm-up')) {
-      botResponse = "Great warm-up: 5-10 min light cardio, dynamic stretches, and bodyweight movements like arm circles and leg swings! 🔥";
-    } else if (text.toLowerCase().includes('reps')) {
-      botResponse = "For beginners: 8-12 reps for strength, 12-15 for endurance. Listen to your body! 💪";
-    } else if (text.toLowerCase().includes('beginner')) {
-      botResponse = "Perfect beginner exercises: Push-ups, squats, planks, and walking! Start slow and build up gradually. You've got this! 🌟";
-    } else if (text.toLowerCase().includes('motivate')) {
-      botResponse = "You're stronger than you think! Every workout counts, every rep matters. Your future self will thank you! Let's go! 🚀💪";
-    }
+    setMessages(prev => [...prev, newUserMessage]);
+    setInputText('');
+    setIsLoading(true);
+
+    const botResponse = await callOllamaAPI(text);
 
     const newBotMessage = {
       id: messages.length + 2,
@@ -42,8 +91,8 @@ export default function GymBuddy() {
       isBot: true,
     };
 
-    setMessages([...messages, newUserMessage, newBotMessage]);
-    setInputText('');
+    setMessages(prev => [...prev, newBotMessage]);
+    setIsLoading(false);
   };
 
   return (
@@ -67,6 +116,12 @@ export default function GymBuddy() {
             </Text>
           </View>
         ))}
+        {isLoading && (
+          <View style={[styles.messageContainer, styles.botMessage]}>
+            <ActivityIndicator size="small" color="#fff" />
+            <Text style={[styles.messageText, styles.botText]}>Thinking... 🤔</Text>
+          </View>
+        )}
       </ScrollView>
 
       <View style={styles.quickTipsContainer}>
