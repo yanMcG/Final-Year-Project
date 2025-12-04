@@ -1,42 +1,58 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import styles from './gymbuddystyles';
 
 export default function GymBuddy() {
-  const [messages, setMessages] = useState([
+  let [messages, setMessages] = useState([
     { id: 1, text: "Hey! I'm your GYM Buddy! 💪 How can I help you today?", isBot: true },
     { id: 2, text: "I can help you with workout tips, form guidance, and motivation!", isBot: true },
   ]);
-  const [inputText, setInputText] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // useState for input text and loading state
+  let [inputText, setInputText] = useState('');
+  let [isLoading, setIsLoading] = useState(false);
 
-  // Ollama API Configuration
-  //PC Ip 172.16.18.2
-  const OLLAMA_API_URL = 'http://localhost:11434/api/chat';
-  const OLLAMA_MODEL = 'gemma2:2b'; // Your installed model
+  // Ollama API Configuration to localhost
+  let OLLAMA_API_URL = 'http://localhost:11434/api/chat';
 
-  const quickTips = [
+  //installed model
+  let OLLAMA_MODEL = 'gemma2:2b';
+
+
+  // Predefined quick tips/questions object
+  let quickTips = [
     "What's a good warm-up routine?",
     "How many reps should I do?",
     "Best exercises for beginners?",
     "Motivate me!",
   ];
 
-  const callOllamaAPI = async (userMessage) => {
+
+  // Function to call Ollama API that handles user messages and returns bot responses
+  let callOllamaAPI = async (userMessage) => {
     try {
-      const response = await fetch(OLLAMA_API_URL, {
+      //fetch request to Ollama API
+      let response = await fetch(OLLAMA_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        //request body with model and messages
         body: JSON.stringify({
+          // Specify the model and messages for the chat that i predefined already
           model: OLLAMA_MODEL,
           messages: [
-            {
+            { 
+              //System message to set the behavior of the assistant
               role: 'system',
+
+              // Define the assistant's role and response style for training and context of chatbot
               content: 'You are a helpful and motivating gym buddy assistant. Provide concise, practical workout advice, form tips, and motivation. Keep responses short and energetic with emojis.',
             },
             {
+              // User message containing the actual question or input from the user
               role: 'user',
+
+              // Pass the user message received from the function parameter
               content: userMessage,
             },
           ],
@@ -44,20 +60,27 @@ export default function GymBuddy() {
         }),
       });
 
+
+      // Check if response is valid
       if (!response.ok) {
         throw new Error(`Ollama API error: ${response.status}`);
       }
+      let data = await response.json();
 
-      const data = await response.json();
+      // Return the content of the bot's message from the API response or a default message
       return data.message?.content || "I'm here to help! 💪";
+
+
     } catch (error) {
       console.error('Ollama API Error:', error);
       return getFallbackResponse(userMessage);
     }
   };
 
-  const getFallbackResponse = (text) => {
-    const lowerText = text.toLowerCase();
+
+  // Function to provide fallback responses if Ollama API fails or is unreachable
+  let getFallbackResponse = (text) => {
+    let lowerText = text.toLowerCase();
     if (lowerText.includes('warm-up')) {
       return "Great warm-up: 5-10 min light cardio, dynamic stretches, and bodyweight movements like arm circles and leg swings! 🔥";
     } else if (lowerText.includes('reps')) {
@@ -70,35 +93,51 @@ export default function GymBuddy() {
     return "That's a great question! Keep pushing yourself! 💪";
   };
 
-  const sendMessage = async (text) => {
+
+  // Function to handle sending messages
+  let sendMessage = async (text) => {
+    // Prevent sending empty messages or if already loading
     if (!text.trim() || isLoading) return;
 
-    const newUserMessage = {
+
+    // Add user message to chat
+    let newUserMessage = {
       id: messages.length + 1,
       text: text,
       isBot: false,
     };
 
+    // Update messages state with new user message
     setMessages(prev => [...prev, newUserMessage]);
     setInputText('');
     setIsLoading(true);
 
-    const botResponse = await callOllamaAPI(text);
 
-    const newBotMessage = {
+    // Call Ollama API to get bot response
+    let botResponse = await callOllamaAPI(text);
+
+
+    // Add bot response to chat that we got from API
+    let newBotMessage = {
       id: messages.length + 2,
       text: botResponse,
       isBot: true,
     };
 
+
+    // Update messages state with new bot message
     setMessages(prev => [...prev, newBotMessage]);
     setIsLoading(false);
   };
 
   return (
+    // Main container
     <View style={styles.container}>
-      <Text style={styles.title}>GYM Buddy 🤖💪</Text>
+      <Text style={styles.title}>GYM Buddy</Text>
       
+
+
+      {/* Chat messages container */}
       <ScrollView style={styles.chatContainer}>
         {messages.map((message) => (
           <View
@@ -119,11 +158,16 @@ export default function GymBuddy() {
         {isLoading && (
           <View style={[styles.messageContainer, styles.botMessage]}>
             <ActivityIndicator size="small" color="#fff" />
-            <Text style={[styles.messageText, styles.botText]}>Thinking... 🤔</Text>
+            <Text style={[styles.messageText, styles.botText]}>Thinking...</Text>
           </View>
         )}
       </ScrollView>
 
+
+
+
+
+      {/* Quick questions container */}
       <View style={styles.quickTipsContainer}>
         <Text style={styles.quickTipsTitle}>Quick Questions:</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -139,6 +183,11 @@ export default function GymBuddy() {
         </ScrollView>
       </View>
 
+
+
+
+
+      {/* Input container for user messages */}
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.textInput}
@@ -158,93 +207,5 @@ export default function GymBuddy() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  chatContainer: {
-    flex: 1,
-    padding: 15,
-  },
-  messageContainer: {
-    marginVertical: 5,
-    padding: 12,
-    borderRadius: 15,
-    maxWidth: '80%',
-  },
-  botMessage: {
-    backgroundColor: '#007AFF',
-    alignSelf: 'flex-start',
-  },
-  userMessage: {
-    backgroundColor: '#34C759',
-    alignSelf: 'flex-end',
-  },
-  messageText: {
-    fontSize: 16,
-  },
-  botText: {
-    color: '#fff',
-  },
-  userText: {
-    color: '#fff',
-  },
-  quickTipsContainer: {
-    padding: 15,
-    backgroundColor: '#fff',
-  },
-  quickTipsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
-  },
-  quickTipButton: {
-    backgroundColor: '#E3F2FD',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  quickTipText: {
-    color: '#007AFF',
-    fontSize: 14,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 15,
-    backgroundColor: '#fff',
-    alignItems: 'flex-end',
-  },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
-    maxHeight: 100,
-    fontSize: 16,
-  },
-  sendButton: {
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
+
+

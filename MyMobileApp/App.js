@@ -9,17 +9,22 @@ import PreviousWorkouts from './screens/PreviousWorkouts';
 import StartWorkout from './screens/StartWorkout';
 import GymBuddy from './screens/GymBuddy';
 
+// Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
 
+
+// Main App component
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator
+        // Define screen options for the tab navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
-
+            // Set icon based on the route name and focus state
             if (route.name === 'Previous Workouts') {
+              // Use different icons for focused and unfocused states
               iconName = focused ? 'list' : 'list-outline';
             } else if (route.name === 'Start Workout') {
               iconName = focused ? 'play-circle' : 'play-circle-outline';
