@@ -6,11 +6,8 @@ export default function StartWorkout() {
   const [isWorkoutStarted, setIsWorkoutStarted] = useState(false);
 
   const workoutTypes = [
-    { id: 1, name: 'Upper Body Strength', duration: '45-60 min', exercises: 8 },
-    { id: 2, name: 'Lower Body Strength', duration: '45-60 min', exercises: 6 },
-    { id: 3, name: 'Cardio HIIT', duration: '20-30 min', exercises: 5 },
-    { id: 4, name: 'Full Body', duration: '60-75 min', exercises: 10 },
-    { id: 5, name: 'Core & Abs', duration: '20-30 min', exercises: 6 },
+    { id: 1, name: 'Full Body', duration: '30 min', exercises: 3},
+   
   ];
 
   const startWorkout = (workout) => {

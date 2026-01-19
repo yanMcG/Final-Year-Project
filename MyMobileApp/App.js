@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 // Import our screen components
 import PreviousWorkouts from './screens/PreviousWorkouts';
 import StartWorkout from './screens/StartWorkout';
-import GymBuddy from './screens/GymBuddy';
+import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
 
 // Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
