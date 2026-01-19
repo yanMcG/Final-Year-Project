@@ -1,38 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 
-export default function StartWorkout() {
-  const [selectedWorkout, setSelectedWorkout] = useState(null);
-  const [isWorkoutStarted, setIsWorkoutStarted] = useState(false);
-
+export default function StartWorkout({ navigation }) {
   const workoutTypes = [
     { id: 1, name: 'Full Body', duration: '30 min', exercises: 3},
-   
   ];
 
   const startWorkout = (workout) => {
-    setSelectedWorkout(workout);
-    setIsWorkoutStarted(true);
-  };
+    const exercises = [
+      { id: 1, name: 'Barbell Bench Press', sets: 1 },
+      { id: 2, name: 'Barbell Squat', sets: 1 },
+      { id: 3, name: 'Pull Up', sets: 1 },
+    ];
 
-  if (isWorkoutStarted && selectedWorkout) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Workout in Progress</Text>
-        <View style={styles.workoutCard}>
-          <Text style={styles.workoutName}>{selectedWorkout.name}</Text>
-          <Text style={styles.workoutInfo}>Duration: {selectedWorkout.duration}</Text>
-          <Text style={styles.workoutInfo}>Exercises: {selectedWorkout.exercises}</Text>
-        </View>
-        <TouchableOpacity 
-          style={styles.stopButton}
-          onPress={() => setIsWorkoutStarted(false)}
-        >
-          <Text style={styles.buttonText}>End Workout</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+    navigation.navigate('WorkoutInProgress', { workout, exercises });
+  };
 
   return (
     <View style={styles.container}>
@@ -103,13 +85,6 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginTop: 10,
-    alignItems: 'center',
-  },
-  stopButton: {
-    backgroundColor: '#FF3B30',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
     alignItems: 'center',
   },
   buttonText: {

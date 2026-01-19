@@ -8,10 +8,10 @@ import { Ionicons } from '@expo/vector-icons';
 import PreviousWorkouts from './screens/PreviousWorkouts';
 import StartWorkout from './screens/StartWorkout';
 import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
+import WorkoutInProgress from './screens/WorkoutInProgress';
 
 // Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
-
 
 // Main App component
 export default function App() {
@@ -30,7 +30,12 @@ export default function App() {
               iconName = focused ? 'play-circle' : 'play-circle-outline';
             } else if (route.name === 'GYM Buddy') {
               iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
+            } else if (route.name === 'WorkoutInProgress') {
+              // hidden screen — pick a harmless default icon
+              iconName = focused ? 'ellipsis-horizontal' : 'ellipsis-horizontal-outline';
             }
+
+            if (!iconName) iconName = 'ellipse';
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
@@ -48,6 +53,11 @@ export default function App() {
         <Tab.Screen name="Previous Workouts" component={PreviousWorkouts} />
         <Tab.Screen name="Start Workout" component={StartWorkout} />
         <Tab.Screen name="GYM Buddy" component={GymBuddy} />
+        <Tab.Screen
+          name="WorkoutInProgress"
+          component={WorkoutInProgress}
+          options={{ tabBarButton: () => null }}
+        />
       </Tab.Navigator>
       <StatusBar style="light" />
     </NavigationContainer>
