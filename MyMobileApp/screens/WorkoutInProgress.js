@@ -31,6 +31,37 @@ export default function WorkoutInProgress({ route, navigation }) {
       reps: reps[ex.id] === '' ? 0 : parseInt(reps[ex.id], 10),
     }));
 
+
+
+
+
+
+  ///save workout to a database
+  let saveworkout = async () => {
+    try {
+      let response = await fetch('https://example.com/api/saveworkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(results),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      let data = await response.json();
+      console.log('Workout saved successfully:', data);
+      alert('Workout saved successfully!');
+    } catch (error) {
+      console.error('Error saving workout:', error);
+    }
+
+
+
+
+
     // simple validation: at least one rep entered
     const anyEntered = results.some((r) => r.reps > 0);
     if (!anyEntered) {
@@ -156,4 +187,4 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 15,
   },
-});
+})}
