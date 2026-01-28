@@ -5,10 +5,10 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
 // Import our screen components
-import PreviousWorkouts from './screens/PreviousWorkouts';
-import StartWorkout from './screens/StartWorkout';
+import PreviousWorkouts from './screens/PreviousWorkoutScreen/PreviousWorkouts';
+import StartWorkout from './screens/startWorkoutScreen/StartWorkout';
 import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
-import WorkoutInProgress from './screens/WorkoutInProgress';
+import WorkoutInProgress from './screens/startWorkoutScreen/wokroutInProgress/WorkoutInProgress';
 
 // Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
