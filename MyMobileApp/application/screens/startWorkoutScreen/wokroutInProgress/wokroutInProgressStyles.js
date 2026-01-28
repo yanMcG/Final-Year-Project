@@ -1,27 +1,24 @@
 import { StyleSheet } from 'react-native';
+import globalStyles from '../../../globalStyles';
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...globalStyles.container,
     backgroundColor: '#f5f5f5',
     padding: 20,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...globalStyles.title,
     color: '#333',
     marginBottom: 12,
-    textAlign: 'center',
   },
   list: {
     flex: 1,
   },
   card: {
-    backgroundColor: '#fff',
+    ...globalStyles.card,
     padding: 16,
-    marginBottom: 12,
     borderRadius: 12,
-    elevation: 3,
   },
   exerciseName: {
     fontSize: 18,
@@ -52,15 +49,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#fafafa',
   },
   endButton: {
-    backgroundColor: '#007AFF',
+    ...globalStyles.button,
     padding: 14,
     borderRadius: 10,
-    alignItems: 'center',
     marginTop: 10,
   },
   endButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    ...globalStyles.buttonText,
     fontSize: 16,
   },
   cancelButton: {

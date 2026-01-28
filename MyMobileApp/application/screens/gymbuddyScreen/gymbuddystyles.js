@@ -1,15 +1,14 @@
 import { StyleSheet } from 'react-native';
+import globalStyles from '../../globalStyles';
 
 let styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...globalStyles.container,
     backgroundColor: '#f5f5f5',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    ...globalStyles.title,
     color: '#333',
-    textAlign: 'center',
     paddingTop: 20,
     paddingBottom: 10,
   },
@@ -79,14 +78,13 @@ let styles = StyleSheet.create({
     fontSize: 16,
   },
   sendButton: {
-    backgroundColor: '#007AFF',
+    ...globalStyles.button,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 20,
   },
   sendButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    ...globalStyles.buttonText,
     fontSize: 16,
   },
 });

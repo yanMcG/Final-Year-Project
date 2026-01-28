@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
+import globalStyles from '../../globalStyles';
 
 export default function PreviousWorkouts() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Previous Workouts</Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Previous Workouts</Text>
       <ScrollView style={styles.workoutList}>
         <View style={styles.workoutItem}>
           <Text style={styles.workoutDate}>November 5, 2025</Text>
@@ -26,35 +27,15 @@ export default function PreviousWorkouts() {
   );
 }
 
+import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   workoutList: {
     flex: 1,
   },
   workoutItem: {
-    backgroundColor: '#fff',
+    ...globalStyles.card,
     padding: 15,
-    marginBottom: 10,
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   workoutDate: {
     fontSize: 16,

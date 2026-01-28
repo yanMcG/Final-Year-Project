@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import globalStyles from '../../globalStyles';
 
 export default function StartWorkout({ navigation }) {
   const workoutTypes = [
@@ -17,8 +18,8 @@ export default function StartWorkout({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Start a Workout</Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Start a Workout</Text>
       <ScrollView style={styles.workoutList}>
         {workoutTypes.map((workout) => (
           <TouchableOpacity
@@ -29,8 +30,8 @@ export default function StartWorkout({ navigation }) {
             <Text style={styles.workoutName}>{workout.name}</Text>
             <Text style={styles.workoutInfo}>Duration: {workout.duration}</Text>
             <Text style={styles.workoutInfo}>Exercises: {workout.exercises}</Text>
-            <View style={styles.startButton}>
-              <Text style={styles.buttonText}>Start Workout</Text>
+            <View style={globalStyles.button}>
+              <Text style={globalStyles.buttonText}>Start Workout</Text>
             </View>
           </TouchableOpacity>
         ))}
@@ -39,35 +40,15 @@ export default function StartWorkout({ navigation }) {
   );
 }
 
+import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
   workoutList: {
     flex: 1,
   },
   workoutCard: {
-    backgroundColor: '#fff',
+    ...globalStyles.card,
     padding: 20,
-    marginBottom: 15,
     borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   workoutName: {
     fontSize: 20,
@@ -79,17 +60,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginBottom: 5,
-  },
-  startButton: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
