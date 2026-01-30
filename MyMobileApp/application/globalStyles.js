@@ -3,13 +3,13 @@ import { StyleSheet } from 'react-native';
 const globalStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     padding: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#111',
     textAlign: 'center',
     marginBottom: 20,
     paddingTop: 20,
@@ -27,7 +27,7 @@ const globalStyles = StyleSheet.create({
     padding: 16,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#111',
     borderRadius: 10,
     alignItems: 'center',
     padding: 14,

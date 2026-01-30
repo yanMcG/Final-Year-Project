@@ -1,9 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
-import { db } from './firebase';
-import { collection, getDocs } from 'firebase/firestore';
-
 import { db } from './firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -15,9 +12,6 @@ async function getWorkouts() {
   });
   return workouts;
 }
-
-
-
 
 export default function PreviousWorkouts() {
   const [workouts, setWorkouts] = useState([]);

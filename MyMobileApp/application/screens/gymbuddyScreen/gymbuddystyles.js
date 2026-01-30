@@ -4,11 +4,11 @@ import globalStyles from '../../globalStyles';
 let styles = StyleSheet.create({
   container: {
     ...globalStyles.container,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
   },
   title: {
     ...globalStyles.title,
-    color: '#333',
+    color: '#111',
     paddingTop: 20,
     paddingBottom: 10,
   },
@@ -23,11 +23,11 @@ let styles = StyleSheet.create({
     maxWidth: '80%',
   },
   botMessage: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#222',
     alignSelf: 'flex-start',
   },
   userMessage: {
-    backgroundColor: '#34C759',
+    backgroundColor: '#444',
     alignSelf: 'flex-end',
   },
   messageText: {
@@ -47,18 +47,17 @@ let styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: '#333',
+    color: '#111',
   },
   quickTipButton: {
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#eee',
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
     marginRight: 10,
   },
   quickTipText: {
-    color: '#007AFF',
-    fontSize: 14,
+    color: '#111',
   },
   inputContainer: {
     flexDirection: 'row',

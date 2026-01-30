@@ -4,12 +4,12 @@ import globalStyles from '../../../globalStyles';
 const styles = StyleSheet.create({
   container: {
     ...globalStyles.container,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
     padding: 20,
   },
   title: {
     ...globalStyles.title,
-    color: '#333',
+    color: '#111',
     marginBottom: 12,
   },
   list: {
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   exerciseName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#222',
+    color: '#111',
   },
   exerciseInfo: {
     fontSize: 14,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#333',
+    color: '#111',
   },
   input: {
     width: 80,
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
   },
   cancelButtonText: {
-    color: '#333',
+    color: '#111',
     fontSize: 15,
   },
 });
