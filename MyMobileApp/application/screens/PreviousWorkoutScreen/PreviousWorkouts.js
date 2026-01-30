@@ -1,27 +1,47 @@
 import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
+import { db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
+import { db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
+
+async function getWorkouts() {
+  const querySnapshot = await getDocs(collection(db, 'workouts'));
+  const workouts = [];
+  querySnapshot.forEach((doc) => {
+    workouts.push({ id: doc.id, ...doc.data() });
+  });
+  return workouts;
+}
+
+
+
 
 export default function PreviousWorkouts() {
+  const [workouts, setWorkouts] = useState([]);
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      const data = await getWorkouts();
+      setWorkouts(data);
+    };
+
+    fetchWorkouts();
+  }, []);
+
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Previous Workouts</Text>
       <ScrollView style={styles.workoutList}>
-        <View style={styles.workoutItem}>
-          <Text style={styles.workoutDate}>November 5, 2025</Text>
-          <Text style={styles.workoutType}>Upper Body Strength</Text>
-          <Text style={styles.workoutDuration}>45 minutes</Text>
-        </View>
-        <View style={styles.workoutItem}>
-          <Text style={styles.workoutDate}>November 3, 2025</Text>
-          <Text style={styles.workoutType}>Cardio Session</Text>
-          <Text style={styles.workoutDuration}>30 minutes</Text>
-        </View>
-        <View style={styles.workoutItem}>
-          <Text style={styles.workoutDate}>November 1, 2025</Text>
-          <Text style={styles.workoutType}>Lower Body Strength</Text>
-          <Text style={styles.workoutDuration}>50 minutes</Text>
-        </View>
+        {workouts.map((workout) => (
+          <View key={workout.id} style={styles.workoutItem}>
+            <Text style={styles.workoutDate}>{workout.date}</Text>
+            <Text style={styles.workoutType}>{workout.type}</Text>
+            <Text style={styles.workoutDuration}>{workout.duration}</Text>
+          </View>
+        ))}
       </ScrollView>
     </View>
   );

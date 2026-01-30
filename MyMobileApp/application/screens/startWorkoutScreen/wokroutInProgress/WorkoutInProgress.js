@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import app from './firebase';
+// Now you can use Firebase services, e.g. Firestore, Auth, etc.
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import styles from './wokroutInProgressStyles';
 
