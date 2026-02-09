@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
-import { db } from './firebase';
+import { db } from '../../firebase/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
 async function getWorkouts() {
@@ -15,28 +15,58 @@ async function getWorkouts() {
 
 export default function PreviousWorkouts() {
   const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchWorkouts = async () => {
-      const data = await getWorkouts();
-      setWorkouts(data);
+      try {
+        const data = await getWorkouts();
+        setWorkouts(data);
+      } catch (err) {
+        setError('Failed to load workouts.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetchWorkouts();
   }, []);
+
+  if (loading) {
+    return (
+      <View style={globalStyles.container}>
+        <Text style={globalStyles.title}>Previous Workouts</Text>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={globalStyles.container}>
+        <Text style={globalStyles.title}>Previous Workouts</Text>
+        <Text style={{ color: 'red' }}>{error}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Previous Workouts</Text>
-      <ScrollView style={styles.workoutList}>
-        {workouts.map((workout) => (
-          <View key={workout.id} style={styles.workoutItem}>
-            <Text style={styles.workoutDate}>{workout.date}</Text>
-            <Text style={styles.workoutType}>{workout.type}</Text>
-            <Text style={styles.workoutDuration}>{workout.duration}</Text>
-          </View>
-        ))}
-      </ScrollView>
+      {workouts.length === 0 ? (
+        <Text>No workouts found.</Text>
+      ) : (
+        <ScrollView style={styles.workoutList}>
+          {workouts.map((workout) => (
+            <View key={workout.id} style={styles.workoutItem}>
+              <Text style={styles.workoutDate}>{workout.date || 'No date'}</Text>
+              <Text style={styles.workoutType}>{workout.type || 'No type'}</Text>
+              <Text style={styles.workoutDuration}>{workout.duration || 'No duration'}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
