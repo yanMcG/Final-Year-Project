@@ -22,3 +22,10 @@
 4. select europe
 
 5. select test mode
+
+<!-- setup firebase in VS code terminal -->
+https://youtu.be/sN_U10eKBl0
+
+
+1. application/firebase> firebase init 
+2.
