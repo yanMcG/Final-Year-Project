@@ -11,6 +11,10 @@
 4. ollama pull gemma2
 5. ollama run gemma2
 
+<!-- install -->
+1. SQLite
+
+
 <!-- create firestore database -->
 1. https://console.firebase.google.com/project/_/firestore/databases?_gl=1*1h5eeqw*_ga*NDAwODQ3MTkzLjE3NzA2NDY1MDU.*_ga_CW55HF8NVT*czE3NzA2NDY1MDQkbzEkZzEkdDE3NzA2NDc0MzgkajQyJGwwJGgw
 

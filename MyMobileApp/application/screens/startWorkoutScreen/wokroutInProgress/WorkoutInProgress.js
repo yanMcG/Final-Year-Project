@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import styles from './wokroutInProgressStyles';
+
+let useSQLite = Platform.OS !== 'web';
+let SQLite, db;
+if (useSQLite) {
+  SQLite = require('expo-sqlite');
+  db = SQLite.openDatabase('workouts.db');
+}
 
 export default function WorkoutInProgress({ route, navigation }) {
   const defaultExercises = [
@@ -39,32 +46,49 @@ export default function WorkoutInProgress({ route, navigation }) {
       return;
     }
 
-    // Save workout to a database
-    try {
-      let response = await fetch('https://example.com/api/saveworkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    // Save workout to SQLite database (if not web)
+    if (useSQLite) {
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10);
+      const duration = 'N/A'; // You can calculate duration if you track start/end time
+      db.transaction(
+        tx => {
+          tx.executeSql(
+            'INSERT INTO workouts (date, type, duration) VALUES (?, ?, ?);',
+            [dateStr, 'Full Body', duration],
+            (_, result) => {
+              const workoutId = result.insertId;
+              let completed = 0;
+              results.forEach((ex, idx) => {
+                tx.executeSql(
+                  'INSERT INTO exercises (workout_id, name, sets, reps) VALUES (?, ?, ?, ?);',
+                  [workoutId, ex.name, ex.sets, ex.reps],
+                  () => {
+                    completed++;
+                    if (completed === results.length) {
+                      // All exercises inserted, show alert and navigate
+                      const summary = results.map((r) => `${r.name}: ${r.reps} reps`).join('\n');
+                      Alert.alert('Workout Results', summary, [
+                        { text: 'OK', onPress: () => navigation.navigate('Previous Workouts') },
+                      ]);
+                    }
+                  }
+                );
+              });
+            }
+          );
         },
-        body: JSON.stringify(results),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      let data = await response.json();
-      console.log('Workout saved successfully:', data);
-      alert('Workout saved successfully!');
-    } catch (error) {
-      console.error('Error saving workout:', error);
+        error => {
+          Alert.alert('Error', 'Failed to save workout.');
+        }
+      );
+      return; // Prevent double alert
     }
 
-    // For now just show a summary alert and go back
+    // For web: just show a summary alert and go back
     const summary = results.map((r) => `${r.name}: ${r.reps} reps`).join('\n');
-
     Alert.alert('Workout Results', summary, [
-      { text: 'OK', onPress: () => navigation.navigate('Start Workout') },
+      { text: 'OK', onPress: () => navigation.navigate('Previous Workouts') },
     ]);
   };
 
