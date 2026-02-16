@@ -1,16 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
-import { db } from '../../firebase/firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import * as SQLite from 'expo-sqlite';
 
-async function getWorkouts() {
-  const querySnapshot = await getDocs(collection(db, 'workouts'));
-  const workouts = [];
-  querySnapshot.forEach((doc) => {
-    workouts.push({ id: doc.id, ...doc.data() });
+const db = SQLite.openDatabase('workouts.db');
+
+function initializeDatabase(setWorkouts, setLoading, setError) {
+  db.transaction((tx) => {
+    // Create table if it doesn't exist
+    tx.executeSql(
+      'CREATE TABLE IF NOT EXISTS workouts (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, type TEXT, duration TEXT);'
+    );
+    // Check if table is empty
+    tx.executeSql(
+      'SELECT COUNT(*) as count FROM workouts;',
+      [],
+      (_, { rows }) => {
+        if (rows._array[0].count === 0) {
+          // Insert sample data
+          tx.executeSql(
+            'INSERT INTO workouts (date, type, duration) VALUES (?, ?, ?), (?, ?, ?), (?, ?, ?);',
+            [
+              '2026-02-01', 'Full Body', '45 min',
+              '2026-02-05', 'Cardio', '30 min',
+              '2026-02-10', 'Upper Body', '40 min'
+            ],
+            () => {
+              // Fetch workouts after inserting sample data
+              tx.executeSql(
+                'SELECT * FROM workouts;',
+                [],
+                (_, { rows }) => {
+                  setWorkouts(rows._array);
+                  setLoading(false);
+                },
+                (_, error) => {
+                  setError('Failed to load workouts.');
+                  setLoading(false);
+                  return true;
+                }
+              );
+            }
+          );
+        } else {
+          // Fetch workouts if table is not empty
+          tx.executeSql(
+            'SELECT * FROM workouts;',
+            [],
+            (_, { rows }) => {
+              setWorkouts(rows._array);
+              setLoading(false);
+            },
+            (_, error) => {
+              setError('Failed to load workouts.');
+              setLoading(false);
+              return true;
+            }
+          );
+        }
+      }
+    );
   });
-  return workouts;
 }
 
 export default function PreviousWorkouts() {
@@ -19,18 +69,7 @@ export default function PreviousWorkouts() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const data = await getWorkouts();
-        setWorkouts(data);
-      } catch (err) {
-        setError('Failed to load workouts.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWorkouts();
+    initializeDatabase(setWorkouts, setLoading, setError);
   }, []);
 
   if (loading) {
