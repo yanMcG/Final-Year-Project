@@ -12,6 +12,7 @@
     "@react-navigation/bottom-tabs": "^7.8.2",
     "@react-navigation/native": "^7.1.19",
     "expo": "~54.0.32",
+    "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
     "firebase": "^12.8.0",
     "ollama": "^0.6.3",

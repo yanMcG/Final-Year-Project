@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Platform } from 'react-native';
 import globalStyles from '../../globalStyles';
-import * as SQLite from 'expo-sqlite';
 
-const db = SQLite.openDatabase('workouts.db');
+let sampleWorkouts = [
+  { id: 1, date: '2026-02-01', type: 'Full Body', duration: '45 min' },
+  { id: 2, date: '2026-02-05', type: 'Cardio', duration: '30 min' },
+  { id: 3, date: '2026-02-10', type: 'Upper Body', duration: '40 min' }
+];
+
+let useSQLite = Platform.OS !== 'web';
+let SQLite, db;
+if (useSQLite) {
+  SQLite = require('expo-sqlite');
+  db = SQLite.openDatabase('workouts.db');
+}
 
 function initializeDatabase(setWorkouts, setLoading, setError) {
+  if (!useSQLite) {
+    setWorkouts(sampleWorkouts);
+    setLoading(false);
+    return;
+  }
   db.transaction((tx) => {
     // Create table if it doesn't exist
     tx.executeSql(
