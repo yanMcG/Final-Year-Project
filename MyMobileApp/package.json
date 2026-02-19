@@ -13,7 +13,7 @@
     "@react-navigation/native": "^7.1.19",
     "expo": "~54.0.32",
     "expo-status-bar": "~3.0.9",
-    "firebase": "^12.8.0",
+    "firebase": "^12.9.0",
     "ollama": "^0.6.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
