@@ -1,7 +1,35 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
 import styles from './gymbuddystyles';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../../firebase/Firebase';
 
+/*
+How it would work:
+
+Fetch the user's workout data from Firestore (e.g., their last workout or workout history).
+Format this data as a summary or structured text.
+Send this summary as part of the user message (or as a system prompt) to the Ollama API, asking for feedback or analysis.
+Display the AI-generated feedback in the chat.
+Example Flow:
+
+User presses a button like "Get Feedback on My Last Workout".
+The app fetches the last workout from Firestore.
+The app sends a message to Ollama like:
+"Here is my last workout: [workout summary]. Please give me feedback, tips, or motivation based on this."
+Ollama responds with personalized feedback.
+What you need to implement:
+
+A function to fetch the latest workout from Firestore.
+A button in GymBuddy to trigger this.
+Modify the Ollama API call to include the workout data in the prompt.
+
+
+
+
+INSTALL A PIPELINE TO AUTOMATICALLY UPDATE THE CHATBOT WITH NEW WORKOUT DATA FROM FIRESTORE
+BUT ALSO TO INSTALL OLLAMA GEMMA 2B MODEL LOCALLY AND CONNECT IT TO THE CHATBOT
+*/
 export default function GymBuddy() {
   let [messages, setMessages] = useState([
     { id: 1, text: "Hey! I'm your GYM Buddy! 💪 How can I help you today?", isBot: true },
@@ -10,12 +38,13 @@ export default function GymBuddy() {
   // useState for input text and loading state
   let [inputText, setInputText] = useState('');
   let [isLoading, setIsLoading] = useState(false);
+  let [latestWorkout, setLatestWorkout] = useState(null);
 
   // Ollama API Configuration to localhost
   let OLLAMA_API_URL = 'http://localhost:11434/api/chat';
 
   //installed model
-  let OLLAMA_MODEL = 'gemma2:2b';
+  let OLLAMA_MODEL = 'gemma2:2b'; // or gemma2
 
 
   // Predefined quick tips/questions object
@@ -130,11 +159,73 @@ export default function GymBuddy() {
     setIsLoading(false);
   };
 
+  // Function to check if Ollama and the model are available
+  async function checkOllamaAndModel() {
+    try {
+      const response = await fetch('http://localhost:11434/api/tags');
+      const data = await response.json();
+      const hasGemma = data.models.some(model => model.name === 'gemma2:2b');
+      if (!hasGemma) {
+        Alert.alert('Ollama is running, but the gemma2:2b model is not pulled. Please run: ollama pull gemma2:2b');
+      }
+      return hasGemma;
+    } catch (e) {
+      Alert.alert('Ollama is not running or not installed. Please install Ollama and run: ollama pull gemma2:2b');
+      return false;
+    }
+  }
+
+  // Function to fetch the latest workout from Firestore
+  async function fetchLatestWorkout() {
+    const querySnapshot = await getDocs(collection(db, 'workouts'));
+    let latest = null;
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (!latest || new Date(data.date) > new Date(latest.date)) {
+        latest = { id: doc.id, ...data };
+      }
+    });
+    return latest;
+  }
+
+  // Button handler to get feedback on last workout
+  let getFeedbackOnLastWorkout = async () => {
+    setIsLoading(true);
+    // Check Ollama/model
+    const ollamaReady = await checkOllamaAndModel();
+    if (!ollamaReady) {
+      setIsLoading(false);
+      return;
+    }
+    // Fetch latest workout
+    const workout = await fetchLatestWorkout();
+    setLatestWorkout(workout);
+    if (!workout) {
+      setMessages(prev => [...prev, { id: messages.length + 1, text: 'No workout data found.', isBot: true }]);
+      setIsLoading(false);
+      return;
+    }
+    // Format workout summary
+    let summary = `Workout Title: ${workout.workoutTitle || 'N/A'}\nDate: ${workout.date || 'N/A'}\nDuration: ${workout.duration || 'N/A'} seconds\nExercises:`;
+    if (Array.isArray(workout.exercises)) {
+      summary += '\n' + workout.exercises.map(ex => `- ${ex.name}: ${ex.reps} reps, ${ex.sets} sets`).join('\n');
+    }
+    // Send to Ollama
+    let prompt = `Here is my last workout:\n${summary}\nPlease give me feedback, tips, or motivation based on this.`;
+    let botResponse = await callOllamaAPI(prompt);
+    setMessages(prev => [...prev, { id: messages.length + 1, text: prompt, isBot: false }]);
+    setMessages(prev => [...prev, { id: messages.length + 2, text: botResponse, isBot: true }]);
+    setIsLoading(false);
+  };
+
   return (
     // Main container
     <View style={styles.container}>
       <Text style={styles.title}>GYM Buddy</Text>
-      
+      {/* Feedback Button */}
+      <TouchableOpacity style={{ backgroundColor: '#007AFF', padding: 10, borderRadius: 8, marginBottom: 10, alignSelf: 'center' }} onPress={getFeedbackOnLastWorkout}>
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>Get Feedback on My Last Workout</Text>
+      </TouchableOpacity>
 
 
       {/* Chat messages container */}
