@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
+import { useEffect } from 'react';
+
 
 export default function StartWorkout({ navigation }) {
   const workoutTypes = [

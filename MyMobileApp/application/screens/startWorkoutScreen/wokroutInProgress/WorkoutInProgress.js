@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import styles from './wokroutInProgressStyles';
+import { db } from '../../../firebase/Firebase';
+import { addDoc, collection } from 'firebase/firestore';
+
+// collection name: workouts
+// each document in workout is a workout itself made up of:
+      // date, duration, exercises, set, reps
+
 
 export default function WorkoutInProgress({ route, navigation }) {
   const defaultExercises = [
@@ -26,7 +33,6 @@ export default function WorkoutInProgress({ route, navigation }) {
 
   const handleEndWorkout = async () => {
     const results = exercises.map((ex) => ({
-      id: ex.id,
       name: ex.name,
       sets: ex.sets,
       reps: reps[ex.id] === '' ? 0 : parseInt(reps[ex.id], 10),
@@ -39,33 +45,19 @@ export default function WorkoutInProgress({ route, navigation }) {
       return;
     }
 
-    // Save workout to a database
+    // Save workout to Firestore
     try {
-      let response = await fetch('https://example.com/api/saveworkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(results),
+      const docRef = await addDoc(collection(db, 'workouts'), {
+        date: new Date().toString(),
+        exercises: results,
       });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      let data = await response.json();
-      console.log('Workout saved successfully:', data);
-      alert('Workout saved successfully!');
+      console.log('Workout saved with ID:', docRef.id);
+      Alert.alert('Success', 'Workout saved successfully!');
+      navigation.navigate('StartWorkout', { refresh: Date.now() });
     } catch (error) {
       console.error('Error saving workout:', error);
+      Alert.alert('Error', `Failed to save workout: ${error.message}`);
     }
-
-    // For now just show a summary alert and go back
-    const summary = results.map((r) => `${r.name}: ${r.reps} reps`).join('\n');
-
-    Alert.alert('Workout Results', summary, [
-      { text: 'OK', onPress: () => navigation.navigate('Start Workout') },
-    ]);
   };
 
   return (
