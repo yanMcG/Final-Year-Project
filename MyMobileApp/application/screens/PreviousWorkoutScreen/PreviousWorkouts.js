@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import globalStyles from '../../globalStyles';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { getReps, uploadReps } from '../../firebase/Firebase';
 import { db } from '../../firebase/Firebase';
 
@@ -51,6 +51,20 @@ export default function PreviousWorkouts() {
     }
   };
 
+  // Remove all workouts from Firestore
+  const handleRemoveData = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'workouts'));
+      const deletePromises = querySnapshot.docs.map((d) => deleteDoc(doc(db, 'workouts', d.id)));
+      await Promise.all(deletePromises);
+      setWorkouts([]);
+      Alert.alert('Success', 'All workout data removed.');
+    } catch (err) {
+      setError('Failed to remove data.');
+      console.error(err);
+    }
+  };
+
   // Fetch workouts from Firestore on component mount
   useEffect(() => {
     const fetchWorkouts = async () => {
@@ -87,6 +101,10 @@ export default function PreviousWorkouts() {
 
   return (
     <View style={globalStyles.container}>
+      {/* Remove Data Button */}
+      <TouchableOpacity onPress={handleRemoveData} style={{ backgroundColor: '#ff3b30', padding: 10, borderRadius: 8, marginBottom: 10, alignSelf: 'center' }}>
+        <Text style={{ color: 'white', fontWeight: 'bold' }}>Remove Data</Text>
+      </TouchableOpacity>
       <Text style={globalStyles.title}>Previous Workouts</Text>
       {workouts.length === 0 ? (
         <Text>No workouts found.</Text>
@@ -102,7 +120,7 @@ export default function PreviousWorkouts() {
                 hour: '2-digit', minute: '2-digit', second: '2-digit',
                 timeZone: 'GMT',
                 hour12: false
-              }) + ' GMT';
+              });
             }
             // Format duration
             let formattedDuration = 'No duration';
