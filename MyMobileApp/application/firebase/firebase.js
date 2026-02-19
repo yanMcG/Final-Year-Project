@@ -18,12 +18,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Example functions to interact with Firestore
 const getReps = async() => {
     const docRef = doc(db, 'reps', 'currentRep');
     const docSnap = await getDoc(docRef);
     return docSnap.data().repetitions;
 }
 
+
+// This function will update the reps in Firestore. It takes a string input, converts it to an integer, and updates the 'currentRep' document in the 'reps' collection.
 const uploadReps = async(newReps) => {
     const docRef = doc(db, 'reps', 'currentRep');
     let result = await updateDoc(docRef, {

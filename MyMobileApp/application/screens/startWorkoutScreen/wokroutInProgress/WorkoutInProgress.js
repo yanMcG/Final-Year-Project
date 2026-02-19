@@ -1,13 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import styles from './wokroutInProgressStyles';
 import { db } from '../../../firebase/Firebase';
 import { addDoc, collection } from 'firebase/firestore';
-
-// collection name: workouts
-// each document in workout is a workout itself made up of:
-      // date, duration, exercises, set, reps
-
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function WorkoutInProgress({ route, navigation }) {
   const defaultExercises = [
@@ -17,6 +13,7 @@ export default function WorkoutInProgress({ route, navigation }) {
   ];
 
   const exercises = route?.params?.exercises ?? defaultExercises;
+  const workoutTitle = 'Full Body';
 
   const initialReps = exercises.reduce((acc, ex) => {
     acc[ex.id] = '';
@@ -24,6 +21,17 @@ export default function WorkoutInProgress({ route, navigation }) {
   }, {});
 
   const [reps, setReps] = useState(initialReps);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [elapsed, setElapsed] = useState(0);
+  const timerRef = useRef(null);
+
+  // Live timer effect
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [startTime]);
 
   const handleChange = (id, value) => {
     // allow only numbers
@@ -31,7 +39,19 @@ export default function WorkoutInProgress({ route, navigation }) {
     setReps((prev) => ({ ...prev, [id]: sanitized }));
   };
 
+  // Format seconds to mm:ss
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  // When user presses "End Workout", we want to save the workout data to Firestore
   const handleEndWorkout = async () => {
+    // Stop the timer immediately
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     const results = exercises.map((ex) => ({
       name: ex.name,
       sets: ex.sets,
@@ -50,10 +70,12 @@ export default function WorkoutInProgress({ route, navigation }) {
       const docRef = await addDoc(collection(db, 'workouts'), {
         date: new Date().toString(),
         exercises: results,
+        duration: elapsed, // in seconds
+        workoutTitle: workoutTitle,
       });
       console.log('Workout saved with ID:', docRef.id);
       Alert.alert('Success', 'Workout saved successfully!');
-      navigation.navigate('StartWorkout', { refresh: Date.now() });
+      navigation.navigate('PreviousWorkouts'); // Make sure this matches your route name
     } catch (error) {
       console.error('Error saving workout:', error);
       Alert.alert('Error', `Failed to save workout: ${error.message}`);
@@ -62,6 +84,11 @@ export default function WorkoutInProgress({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Timer at the top */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+        <MaterialIcons name="timer" size={24} color="#007AFF" />
+        <Text style={{ fontSize: 18, marginLeft: 6, fontWeight: 'bold' }}>{formatTime(elapsed)}</Text>
+      </View>
       <Text style={styles.title}>Workout In Progress</Text>
       <ScrollView style={styles.list} contentContainerStyle={{ paddingBottom: 40 }}>
         {exercises.map((ex) => (
