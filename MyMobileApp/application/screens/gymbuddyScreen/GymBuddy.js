@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
 import styles from './gymbuddystyles';
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase/Firebase';
-
+import { db } from '../../firebase/firebase';
 /*
 How it would work:
 

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import globalStyles from '../../globalStyles';
 import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import { getReps, uploadReps } from '../../firebase/Firebase';
-import { db } from '../../firebase/Firebase';
+import { getReps, uploadReps } from '../../firebase/firebase';
+import { db } from '../../firebase/firebase';
 
 
 // This screen will show a list of previous workouts stored in Firestore
