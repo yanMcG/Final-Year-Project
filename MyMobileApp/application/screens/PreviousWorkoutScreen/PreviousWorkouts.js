@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import globalStyles from '../../globalStyles';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { getReps, uploadReps } from '../../firebase/firebase';
 import { db } from '../../firebase/firebase';
 
@@ -39,6 +39,21 @@ export default function PreviousWorkouts() {
     getData();
   }, []);
 
+  // Real-time Firestore listener for workouts
+  useEffect(() => {
+    setLoading(true);
+    const unsubscribe = onSnapshot(collection(db, 'workouts'), (snapshot) => {
+      const workoutsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setWorkouts(workoutsData);
+      setLoading(false);
+    }, (err) => {
+      setError('Failed to load workouts.');
+      setLoading(false);
+      console.error(err);
+    });
+    return unsubscribe;
+  }, []);
+
   // Handle form submission to update reps in Firestore
   const handleFormSubmission = async () => {
     try {
@@ -64,22 +79,6 @@ export default function PreviousWorkouts() {
       console.error(err);
     }
   };
-
-  // Fetch workouts from Firestore on component mount
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const data = await getWorkouts();
-        setWorkouts(data);
-      } catch (err) {
-        setError('Failed to load workouts.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchWorkouts();
-  }, []);
 
   if (loading) {
     return (

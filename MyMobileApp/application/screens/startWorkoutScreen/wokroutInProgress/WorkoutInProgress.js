@@ -23,6 +23,7 @@ export default function WorkoutInProgress({ route, navigation }) {
   const [reps, setReps] = useState(initialReps);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
+  const [workoutEnded, setWorkoutEnded] = useState(false);
   const timerRef = useRef(null);
 
   // Live timer effect
@@ -75,7 +76,7 @@ export default function WorkoutInProgress({ route, navigation }) {
       });
       console.log('Workout saved with ID:', docRef.id);
       Alert.alert('Success', 'Workout saved successfully!');
-      navigation.navigate('PreviousWorkouts'); // Make sure this matches your route name
+      navigation.navigate('Previous Workouts'); // Route immediately after save
     } catch (error) {
       console.error('Error saving workout:', error);
       Alert.alert('Error', `Failed to save workout: ${error.message}`);
@@ -109,9 +110,11 @@ export default function WorkoutInProgress({ route, navigation }) {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.endButton} onPress={handleEndWorkout}>
-          <Text style={styles.endButtonText}>Save & End Workout</Text>
-        </TouchableOpacity>
+        {!workoutEnded && (
+          <TouchableOpacity style={styles.endButton} onPress={handleEndWorkout}>
+            <Text style={styles.endButtonText}>Save & End Workout</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>
