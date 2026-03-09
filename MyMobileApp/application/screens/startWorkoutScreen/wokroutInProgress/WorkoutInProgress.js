@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import styles from './wokroutInProgressStyles';
+import { db } from '../../../firebase/firebase';
+import { addDoc, collection } from 'firebase/firestore';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function WorkoutInProgress({ route, navigation }) {
   const defaultExercises = [
@@ -10,6 +13,7 @@ export default function WorkoutInProgress({ route, navigation }) {
   ];
 
   const exercises = route?.params?.exercises ?? defaultExercises;
+  const workoutTitle = 'Full Body';
 
   const initialReps = exercises.reduce((acc, ex) => {
     acc[ex.id] = '';
@@ -17,6 +21,18 @@ export default function WorkoutInProgress({ route, navigation }) {
   }, {});
 
   const [reps, setReps] = useState(initialReps);
+  const [startTime, setStartTime] = useState(Date.now());
+  const [elapsed, setElapsed] = useState(0);
+  const [workoutEnded, setWorkoutEnded] = useState(false);
+  const timerRef = useRef(null);
+
+  // Live timer effect
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [startTime]);
 
   const handleChange = (id, value) => {
     // allow only numbers
@@ -24,9 +40,20 @@ export default function WorkoutInProgress({ route, navigation }) {
     setReps((prev) => ({ ...prev, [id]: sanitized }));
   };
 
+  // Format seconds to mm:ss
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  // When user presses "End Workout", we want to save the workout data to Firestore
   const handleEndWorkout = async () => {
+    // Stop the timer immediately
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
     const results = exercises.map((ex) => ({
-      id: ex.id,
       name: ex.name,
       sets: ex.sets,
       reps: reps[ex.id] === '' ? 0 : parseInt(reps[ex.id], 10),
@@ -39,37 +66,30 @@ export default function WorkoutInProgress({ route, navigation }) {
       return;
     }
 
-    // Save workout to a database
+    // Save workout to Firestore
     try {
-      let response = await fetch('https://example.com/api/saveworkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(results),
+      const docRef = await addDoc(collection(db, 'workouts'), {
+        date: new Date().toString(),
+        exercises: results,
+        duration: elapsed, // in seconds
+        workoutTitle: workoutTitle,
       });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      let data = await response.json();
-      console.log('Workout saved successfully:', data);
-      alert('Workout saved successfully!');
+      console.log('Workout saved with ID:', docRef.id);
+      Alert.alert('Success', 'Workout saved successfully!');
+      navigation.navigate('Previous Workouts'); // Route immediately after save
     } catch (error) {
       console.error('Error saving workout:', error);
+      Alert.alert('Error', `Failed to save workout: ${error.message}`);
     }
-
-    // For now just show a summary alert and go back
-    const summary = results.map((r) => `${r.name}: ${r.reps} reps`).join('\n');
-
-    Alert.alert('Workout Results', summary, [
-      { text: 'OK', onPress: () => navigation.navigate('Start Workout') },
-    ]);
   };
 
   return (
     <View style={styles.container}>
+      {/* Timer at the top */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+        <MaterialIcons name="timer" size={24} color="#007AFF" />
+        <Text style={{ fontSize: 18, marginLeft: 6, fontWeight: 'bold' }}>{formatTime(elapsed)}</Text>
+      </View>
       <Text style={styles.title}>Workout In Progress</Text>
       <ScrollView style={styles.list} contentContainerStyle={{ paddingBottom: 40 }}>
         {exercises.map((ex) => (
@@ -90,9 +110,11 @@ export default function WorkoutInProgress({ route, navigation }) {
           </View>
         ))}
 
-        <TouchableOpacity style={styles.endButton} onPress={handleEndWorkout}>
-          <Text style={styles.endButtonText}>Save & End Workout</Text>
-        </TouchableOpacity>
+        {!workoutEnded && (
+          <TouchableOpacity style={styles.endButton} onPress={handleEndWorkout}>
+            <Text style={styles.endButtonText}>Save & End Workout</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
           <Text style={styles.cancelButtonText}>Cancel</Text>

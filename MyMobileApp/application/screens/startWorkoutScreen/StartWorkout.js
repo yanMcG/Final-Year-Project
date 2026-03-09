@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
+import { useEffect } from 'react';
 
+// This screen will show a list of workout types (e.g., Full Body, Upper Body, etc.)
 export default function StartWorkout({ navigation }) {
   const workoutTypes = [
     { id: 1, name: 'Full Body', duration: '30 min', exercises: 3},
   ];
 
+
+// When user clicks on a workout type, we navigate to the WorkoutInProgress screen and pass the workout
   const startWorkout = (workout) => {
     const exercises = [
       { id: 1, name: 'Barbell Bench Press', sets: 1 },
@@ -17,6 +21,7 @@ export default function StartWorkout({ navigation }) {
     navigation.navigate('WorkoutInProgress', { workout, exercises });
   };
 
+  // This screen will show a list of workout types (e.g., Full Body, Upper Body, etc.)
   return (
     <View style={globalStyles.container}>
       <Text style={globalStyles.title}>Start a Workout</Text>
@@ -40,6 +45,7 @@ export default function StartWorkout({ navigation }) {
   );
 }
 
+// Styles for the StartWorkout screen
 import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   workoutList: {
