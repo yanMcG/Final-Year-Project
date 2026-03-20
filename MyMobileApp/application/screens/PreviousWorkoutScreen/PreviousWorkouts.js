@@ -16,8 +16,8 @@ async function getWorkouts() {
 }
 
 
-// This screen will show a list of previous workouts stored in Firestore
 export default function PreviousWorkouts() {
+  // State variables for workouts, loading state, error messages, and reps input
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -38,6 +38,8 @@ export default function PreviousWorkouts() {
     getData();
   }, []);
 
+
+
   // Real-time Firestore listener for workouts
   useEffect(() => {
     setLoading(true);
@@ -53,6 +55,8 @@ export default function PreviousWorkouts() {
     return unsubscribe;
   }, []);
 
+
+
   // Handle form submission to update reps in Firestore
   const handleFormSubmission = async () => {
     try {
@@ -64,6 +68,8 @@ export default function PreviousWorkouts() {
       console.error(err);
     }
   };
+
+
 
   // Remove all workouts from Firestore
   const handleRemoveData = async () => {
@@ -79,6 +85,8 @@ export default function PreviousWorkouts() {
     }
   };
 
+
+  
   if (loading) {
     return (
       <View style={globalStyles.container}>

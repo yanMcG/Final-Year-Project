@@ -12,7 +12,7 @@ Send this summary as part of the user message (or as a system prompt) to the Oll
 Display the AI-generated feedback in the chat.
 Example Flow:
 
-User presses a button like "Get Feedback on My Last Workout".
+User presses a button Get Feedback on My Last Workout.
 The app fetches the last workout from Firestore.
 The app sends a message to Ollama like:
 "Here is my last workout: [workout summary]. Please give me feedback, tips, or motivation based on this."
@@ -21,26 +21,26 @@ What you need to implement:
 
 A function to fetch the latest workout from Firestore.
 A button in GymBuddy to trigger this.
-Modify the Ollama API call to include the workout data in the prompt.
 
-
-
-
-INSTALL A PIPELINE TO AUTOMATICALLY UPDATE THE CHATBOT WITH NEW WORKOUT DATA FROM FIRESTORE
-BUT ALSO TO INSTALL OLLAMA GEMMA 2B MODEL LOCALLY AND CONNECT IT TO THE CHATBOT
 */
 export default function GymBuddy() {
+
+  // useState for chat messages, initialized with a welcome message from the bot
   let [messages, setMessages] = useState([
     { id: 1, text: "Hey! I'm your GYM Buddy! 💪 How can I help you today?", isBot: true },
     { id: 2, text: "I can help you with workout tips, form guidance, and motivation!", isBot: true },
   ]);
+
+
   // useState for input text and loading state
   let [inputText, setInputText] = useState('');
   let [isLoading, setIsLoading] = useState(false);
   let [latestWorkout, setLatestWorkout] = useState(null);
 
+
   // Ollama API Configuration to localhost
   let OLLAMA_API_URL = 'http://localhost:11434/api/chat';
+
 
   //installed model
   let OLLAMA_MODEL = 'gemma2:2b'; // or gemma2
@@ -98,7 +98,7 @@ export default function GymBuddy() {
       // Return the content of the bot's message from the API response or a default message
       return data.message?.content || "I'm here to help! 💪";
 
-
+      // If there's an error with the API call, log it and return a fallback response
     } catch (error) {
       console.error('Ollama API Error:', error);
       return getFallbackResponse(userMessage);
@@ -158,6 +158,8 @@ export default function GymBuddy() {
     setIsLoading(false);
   };
 
+
+
   // Function to check if Ollama and the model are available
   async function checkOllamaAndModel() {
     try {
@@ -174,6 +176,9 @@ export default function GymBuddy() {
     }
   }
 
+
+
+
   // Function to fetch the latest workout from Firestore
   async function fetchLatestWorkout() {
     const querySnapshot = await getDocs(collection(db, 'workouts'));
@@ -187,15 +192,20 @@ export default function GymBuddy() {
     return latest;
   }
 
+
+
   // Button handler to get feedback on last workout
   let getFeedbackOnLastWorkout = async () => {
     setIsLoading(true);
+
     // Check Ollama/model
     const ollamaReady = await checkOllamaAndModel();
     if (!ollamaReady) {
       setIsLoading(false);
       return;
     }
+
+
     // Fetch latest workout
     const workout = await fetchLatestWorkout();
     setLatestWorkout(workout);
@@ -204,13 +214,17 @@ export default function GymBuddy() {
       setIsLoading(false);
       return;
     }
+
+
     // Format workout summary
     let summary = `Workout Title: ${workout.workoutTitle || 'N/A'}\nDate: ${workout.date || 'N/A'}\nDuration: ${workout.duration || 'N/A'} seconds\nExercises:`;
     if (Array.isArray(workout.exercises)) {
       summary += '\n' + workout.exercises.map(ex => `- ${ex.name}: ${ex.reps} reps, ${ex.sets} sets`).join('\n');
     }
-    // Send to Ollama
-    let prompt = `Here is my last workout:\n${summary}\nPlease give me feedback, tips, or motivation based on this.`;
+
+
+    // Send to Ollama LLM context aware of workout data and ask for feedback
+    let prompt = `Here is my last workout:\n${summary}\nPlease give me feedback, tips, or motivation based on this. you are a personal trainer and should provide feedback on the workout, suggest improvements, and motivate me to keep going!`;
     let botResponse = await callOllamaAPI(prompt);
     setMessages(prev => [...prev, { id: messages.length + 1, text: prompt, isBot: false }]);
     setMessages(prev => [...prev, { id: messages.length + 2, text: botResponse, isBot: true }]);

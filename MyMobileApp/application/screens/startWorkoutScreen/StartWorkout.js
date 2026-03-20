@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
 import { useEffect } from 'react';
 
-// This screen will show a list of workout types (e.g., Full Body, Upper Body, etc.)
+// This screen will show a the wokrout routine predefined
 export default function StartWorkout({ navigation }) {
   const workoutTypes = [
     { id: 1, name: 'Full Body', duration: '30 min', exercises: 3},
@@ -17,7 +17,6 @@ export default function StartWorkout({ navigation }) {
       { id: 2, name: 'Barbell Squat', sets: 1 },
       { id: 3, name: 'Pull Up', sets: 1 },
     ];
-
     navigation.navigate('WorkoutInProgress', { workout, exercises });
   };
 

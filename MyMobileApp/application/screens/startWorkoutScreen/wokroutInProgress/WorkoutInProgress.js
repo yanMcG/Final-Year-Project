@@ -5,26 +5,35 @@ import { db } from '../../../firebase/Firebase';
 import { addDoc, collection } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
+
+
 export default function WorkoutInProgress({ route, navigation }) {
+  // If no exercises are passed via route params, use default exercises
   const defaultExercises = [
     { id: 1, name: 'Barbell Bench Press', sets: 1 },
     { id: 2, name: 'Barbell Squat', sets: 1 },
     { id: 3, name: 'Pull Up', sets: 1 },
   ];
 
+  // Get exercises from route params or use defaults
   const exercises = route?.params?.exercises ?? defaultExercises;
   const workoutTitle = 'Full Body';
 
+  // Initialize reps state for each exercise using their IDs as keys
   const initialReps = exercises.reduce((acc, ex) => {
     acc[ex.id] = '';
     return acc;
   }, {});
 
+
+  // State variables for reps, timer, and workout status
   const [reps, setReps] = useState(initialReps);
   const [startTime, setStartTime] = useState(Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [workoutEnded, setWorkoutEnded] = useState(false);
   const timerRef = useRef(null);
+
+
 
   // Live timer effect
   useEffect(() => {
@@ -34,11 +43,15 @@ export default function WorkoutInProgress({ route, navigation }) {
     return () => clearInterval(timerRef.current);
   }, [startTime]);
 
+
+
+  // Handle changes to reps input, ensuring only numbers are allowed
   const handleChange = (id, value) => {
-    // allow only numbers
     const sanitized = value.replace(/[^0-9]/g, '');
     setReps((prev) => ({ ...prev, [id]: sanitized }));
   };
+
+
 
   // Format seconds to mm:ss
   const formatTime = (seconds) => {
@@ -47,17 +60,23 @@ export default function WorkoutInProgress({ route, navigation }) {
     return `${m}:${s}`;
   };
 
-  // When user presses "End Workout", we want to save the workout data to Firestore
+
+
+  // When user presses "End Workout", I want to save the workout data to Firestore
   const handleEndWorkout = async () => {
     // Stop the timer immediately
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
+
+
+    // Prepare workout data to save - map exercises to include entered reps
     const results = exercises.map((ex) => ({
       name: ex.name,
       sets: ex.sets,
       reps: reps[ex.id] === '' ? 0 : parseInt(reps[ex.id], 10),
     }));
+
 
     // simple validation: at least one rep entered
     const anyEntered = results.some((r) => r.reps > 0);
@@ -66,8 +85,10 @@ export default function WorkoutInProgress({ route, navigation }) {
       return;
     }
 
+
     // Save workout to Firestore
     try {
+      // Add a new document with a generated ID to the 'workouts' collection
       const docRef = await addDoc(collection(db, 'workouts'), {
         date: new Date().toString(),
         exercises: results,

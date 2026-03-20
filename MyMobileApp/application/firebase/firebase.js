@@ -1,9 +1,8 @@
-// Import the functions you need from the SDKs you need
+//Import the functions I need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, collection, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+//web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBGhB1QtdcJPX_srwDEmVRzwOsowc1hmHI",
   authDomain: "gen-lifts.firebaseapp.com",
@@ -14,11 +13,13 @@ const firebaseConfig = {
   measurementId: "G-L4ZWMV2J1K"
 };
 
-// Initialize Firebase
+
+//Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Example functions to interact with Firestore
+
+//functions to interact with Firestore
 const getReps = async() => {
     const docRef = doc(db, 'reps', 'currentRep');
     const docSnap = await getDoc(docRef);
@@ -35,4 +36,6 @@ const uploadReps = async(newReps) => {
     return newReps;
 }
 
+
+// Export the functions and db reference so they can be used in other parts of the app
 export { getReps, uploadReps, db };
