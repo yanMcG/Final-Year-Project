@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import styles from './wokroutInProgressStyles';
-import { db } from '../../../firebase/firebase';
+import { db } from '../../../firebase/Firebase';
 import { addDoc, collection } from 'firebase/firestore';
 import { MaterialIcons } from '@expo/vector-icons';
 
