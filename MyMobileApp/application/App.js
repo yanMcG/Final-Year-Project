@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import globalStyles from './globalStyles';
 
 // Import our screen components
 import PreviousWorkouts from './screens/PreviousWorkoutScreen/PreviousWorkouts';
@@ -41,13 +42,9 @@ export default function App() {
           },
           tabBarActiveTintColor: '#111',
           tabBarInactiveTintColor: 'gray',
-          headerStyle: {
-            backgroundColor: '#111',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
+          headerStyle: globalStyles.headerStyle,
+          headerTintColor: globalStyles.headerTintColor,
+          headerTitleStyle: globalStyles.headerTitleStyle,
         })}
       >
         <Tab.Screen name="Previous Workouts" component={PreviousWorkouts} />

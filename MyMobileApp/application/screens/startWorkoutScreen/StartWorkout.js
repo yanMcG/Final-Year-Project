@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import globalStyles from '../../globalStyles';
+import styles from './startWorkoutStyles';
 import { useEffect } from 'react';
 
 // This screen will show a the wokrout routine predefined
@@ -43,27 +44,3 @@ export default function StartWorkout({ navigation }) {
     </View>
   );
 }
-
-// Styles for the StartWorkout screen
-import { StyleSheet } from 'react-native';
-const styles = StyleSheet.create({
-  workoutList: {
-    flex: 1,
-  },
-  workoutCard: {
-    ...globalStyles.card,
-    padding: 20,
-    borderRadius: 15,
-  },
-  workoutName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  workoutInfo: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 5,
-  },
-});

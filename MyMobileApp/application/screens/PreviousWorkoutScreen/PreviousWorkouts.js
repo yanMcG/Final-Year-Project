@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'reac
 import globalStyles from '../../globalStyles';
 import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { getReps, uploadReps, db } from '../../firebase/Firebase';
+import styles from './previousWorkoutStyles';
 
 
 // This screen will show a list of previous workouts stored in Firestore
@@ -39,7 +40,7 @@ export default function PreviousWorkouts() {
   }, []);
 
 
-
+  
   // Real-time Firestore listener for workouts
   useEffect(() => {
     setLoading(true);
@@ -55,8 +56,6 @@ export default function PreviousWorkouts() {
     return unsubscribe;
   }, []);
 
-
-
   // Handle form submission to update reps in Firestore
   const handleFormSubmission = async () => {
     try {
@@ -68,8 +67,6 @@ export default function PreviousWorkouts() {
       console.error(err);
     }
   };
-
-
 
   // Remove all workouts from Firestore
   const handleRemoveData = async () => {
@@ -85,8 +82,6 @@ export default function PreviousWorkouts() {
     }
   };
 
-
-  
   if (loading) {
     return (
       <View style={globalStyles.container}>
@@ -153,29 +148,3 @@ export default function PreviousWorkouts() {
   );
 }
 
-import { StyleSheet } from 'react-native';
-const styles = StyleSheet.create({
-  workoutList: {
-    flex: 1,
-  },
-  workoutItem: {
-    ...globalStyles.card,
-    padding: 15,
-    borderRadius: 10,
-  },
-  workoutDate: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#007AFF',
-    marginBottom: 5,
-  },
-  workoutType: {
-    fontSize: 18,
-    color: '#333',
-    marginBottom: 5,
-  },
-  workoutDuration: {
-    fontSize: 14,
-    color: '#666',
-  },
-});
