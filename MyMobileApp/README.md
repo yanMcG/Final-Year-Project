@@ -24,3 +24,16 @@
 5. select test mode
 
 6. update rules
+
+
+<!-- FIRESTORE gen-lifts DATABASE -->
+1. Collection Name: workouts
+2. Document ID: (generated ex:WjM4ah4wDdWuuO8HNSRt)
+3. fields:
+      1. date : Date.now()
+      2. duration : number 
+      3. exercises:
+            1. name: string
+            2. sets: number
+            3. reps: number
+      4. workoutTitle : string
