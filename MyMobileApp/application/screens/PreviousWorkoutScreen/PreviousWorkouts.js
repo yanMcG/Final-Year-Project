@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import globalStyles from '../../globalStyles';
 import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
-import { getReps, uploadReps, db } from '../../firebase/Firebase';
+import { getReps, uploadReps } from '../../firebase/firebase';
+import { db } from '../../firebase/firebase';
 import styles from './previousWorkoutStyles';
 
 
