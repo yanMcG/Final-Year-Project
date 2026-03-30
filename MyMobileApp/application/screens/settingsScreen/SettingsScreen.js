@@ -1,47 +1,61 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, Switch, Alert, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, getDocs, deleteDoc, doc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { useDarkMode } from '../../context/DarkModeContext';
 
 export default function SettingsScreen({ navigation }) {
   const { isDarkMode, toggleDarkMode, colors } = useDarkMode();
+  const [deleting, setDeleting] = useState(false);
 
-  // Remove all workouts from Firestore using batch delete for reliability
+  // Performs the actual deletion — called after user confirms
+  const performDelete = async () => {
+    try {
+      setDeleting(true);
+      const querySnapshot = await getDocs(collection(db, 'workouts'));
+      console.log(`Deleting ${querySnapshot.size} workouts...`);
+
+      if (querySnapshot.empty) {
+        alert('No workout data to remove.');
+        setDeleting(false);
+        return;
+      }
+
+      // Delete each document individually — most reliable across web + native
+      const deletePromises = querySnapshot.docs.map((d) =>
+        deleteDoc(doc(db, 'workouts', d.id))
+      );
+      await Promise.all(deletePromises);
+
+      console.log('All workouts deleted successfully.');
+      setDeleting(false);
+      alert('All workout data has been removed.');
+      navigation.navigate('Previous Workouts');
+    } catch (err) {
+      console.error('Error removing data:', err);
+      setDeleting(false);
+      alert(`Failed to remove workout data: ${err.message}`);
+    }
+  };
+
+  // On web, Alert.alert is unreliable — use window.confirm as fallback
   const handleRemoveAllData = () => {
-    Alert.alert(
-      'Remove All Data',
-      'Are you sure you want to delete all previous workout data? This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete All',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const querySnapshot = await getDocs(collection(db, 'workouts'));
-              if (querySnapshot.empty) {
-                Alert.alert('Info', 'No workout data to remove.');
-                return;
-              }
-              // Use batch delete for reliability (Firestore batch supports up to 500 ops)
-              const batch = writeBatch(db);
-              querySnapshot.docs.forEach((d) => {
-                batch.delete(doc(db, 'workouts', d.id));
-              });
-              await batch.commit();
-              Alert.alert('Success', 'All workout data has been removed.');
-              // Navigate back to home so user sees the empty list
-              navigation.navigate('Previous Workouts');
-            } catch (err) {
-              console.error('Error removing data:', err);
-              Alert.alert('Error', `Failed to remove workout data: ${err.message}`);
-            }
-          },
-        },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        'Are you sure you want to delete ALL workout data? This cannot be undone.'
+      );
+      if (confirmed) performDelete();
+    } else {
+      Alert.alert(
+        'Remove All Data',
+        'Are you sure you want to delete all previous workout data? This cannot be undone.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Delete All', style: 'destructive', onPress: performDelete },
+        ]
+      );
+    }
   };
 
   return (
@@ -73,12 +87,15 @@ export default function SettingsScreen({ navigation }) {
 
         {/* Remove All Data */}
         <TouchableOpacity
-          style={[styles.settingRow, { backgroundColor: colors.card, borderColor: colors.border }]}
+          style={[styles.settingRow, { backgroundColor: colors.card, borderColor: colors.border, opacity: deleting ? 0.5 : 1 }]}
           onPress={handleRemoveAllData}
+          disabled={deleting}
         >
           <View style={styles.settingLeft}>
             <Ionicons name="trash-outline" size={24} color="#ff3b30" />
-            <Text style={[styles.settingLabel, { color: '#ff3b30' }]}>Remove All Workout Data</Text>
+            <Text style={[styles.settingLabel, { color: '#ff3b30' }]}>
+              {deleting ? 'Deleting...' : 'Remove All Workout Data'}
+            </Text>
           </View>
           <Ionicons name="chevron-forward" size={20} color={colors.subText} />
         </TouchableOpacity>
