@@ -2,14 +2,16 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './viewPreviousWorkoutStyles';
+import { useDarkMode } from '../../../context/DarkModeContext';
 
 export default function ViewPreviousWorkout({ route, navigation }) {
+  const { colors } = useDarkMode();
   const workout = route?.params?.workout;
 
   if (!workout) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>No workout data found.</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <Text style={{ color: colors.text }}>No workout data found.</Text>
       </View>
     );
   }
@@ -42,9 +44,9 @@ export default function ViewPreviousWorkout({ route, navigation }) {
     : 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Dark Header with back arrow and workout title */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.header }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={26} color="#fff" />
         </TouchableOpacity>
@@ -53,46 +55,46 @@ export default function ViewPreviousWorkout({ route, navigation }) {
 
       <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 40 }}>
         {/* Summary Card: Date, Duration, Total Sets */}
-        <View style={styles.summaryCard}>
+        <View style={[styles.summaryCard, { backgroundColor: colors.card }]}>
           <View style={styles.summaryItem}>
             <View style={styles.summaryLabelRow}>
-              <Ionicons name="calendar-outline" size={16} color="#888" />
-              <Text style={styles.summaryLabel}>Date</Text>
+              <Ionicons name="calendar-outline" size={16} color={colors.subText} />
+              <Text style={[styles.summaryLabel, { color: colors.subText }]}>Date</Text>
             </View>
-            <Text style={styles.summaryValue}>{formattedDate}</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>{formattedDate}</Text>
           </View>
-          <View style={styles.summaryDivider} />
+          <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
           <View style={styles.summaryItem}>
             <View style={styles.summaryLabelRow}>
-              <Ionicons name="time-outline" size={16} color="#888" />
-              <Text style={styles.summaryLabel}>Duration</Text>
+              <Ionicons name="time-outline" size={16} color={colors.subText} />
+              <Text style={[styles.summaryLabel, { color: colors.subText }]}>Duration</Text>
             </View>
-            <Text style={styles.summaryValue}>{formattedDuration}</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>{formattedDuration}</Text>
           </View>
-          <View style={styles.summaryDivider} />
+          <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
           <View style={styles.summaryItem}>
-            <Text style={styles.summaryLabel}>Total Sets</Text>
-            <Text style={styles.summaryValue}>{totalSets}</Text>
+            <Text style={[styles.summaryLabel, { color: colors.subText }]}>Total Sets</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>{totalSets}</Text>
           </View>
         </View>
 
         {/* Exercise Cards */}
         {Array.isArray(workout.exercises) && workout.exercises.map((ex, idx) => (
-          <View key={idx} style={styles.exerciseCard}>
-            <Text style={styles.exerciseName}>{ex.name}</Text>
-            <View style={styles.exerciseDivider} />
+          <View key={idx} style={[styles.exerciseCard, { backgroundColor: colors.card }]}>
+            <Text style={[styles.exerciseName, { color: colors.text }]}>{ex.name}</Text>
+            <View style={[styles.exerciseDivider, { backgroundColor: colors.border }]} />
             {/* Table Header */}
             <View style={styles.tableRow}>
-              <Text style={styles.tableHeader}>Set</Text>
-              <Text style={styles.tableHeader}>Weight (kg)</Text>
-              <Text style={styles.tableHeader}>Reps</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>Set</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>Weight (kg)</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>Reps</Text>
             </View>
             {/* Table Rows — one row per set */}
             {Array.from({ length: ex.sets || 1 }).map((_, setIdx) => (
               <View key={setIdx} style={styles.tableRow}>
-                <Text style={styles.tableCell}>{setIdx + 1}</Text>
-                <Text style={styles.tableCell}>{ex.weight || '-'}</Text>
-                <Text style={styles.tableCell}>{ex.reps || 0}</Text>
+                <Text style={[styles.tableCell, { color: colors.text }]}>{setIdx + 1}</Text>
+                <Text style={[styles.tableCell, { color: colors.text }]}>{ex.weight || '-'}</Text>
+                <Text style={[styles.tableCell, { color: colors.text }]}>{ex.reps || 0}</Text>
               </View>
             ))}
           </View>

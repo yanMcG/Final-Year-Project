@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import globalStyles from '../../globalStyles';
 import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './previousWorkoutStyles';
+import { useDarkMode } from '../../context/DarkModeContext';
 
-export default function PreviousWorkouts({ navigation }) {
+export default function PreviousWorkouts({ navigation, openMenu }) {
+  const { colors, isDarkMode } = useDarkMode();
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,48 +30,39 @@ export default function PreviousWorkouts({ navigation }) {
     return unsubscribe;
   }, []);
 
-  // Remove all workouts from Firestore
-  const handleRemoveData = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'workouts'));
-      const deletePromises = querySnapshot.docs.map((d) => deleteDoc(doc(db, 'workouts', d.id)));
-      await Promise.all(deletePromises);
-      setWorkouts([]);
-      Alert.alert('Success', 'All workout data removed.');
-    } catch (err) {
-      setError('Failed to remove data.');
-      console.error(err);
-    }
-  };
-
   if (loading) {
     return (
-      <View style={globalStyles.container}>
-        <Text>Loading...</Text>
+      <View style={[globalStyles.container, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.text} />
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={globalStyles.container}>
+      <View style={[globalStyles.container, { backgroundColor: colors.background }]}>
         <Text style={{ color: 'red' }}>{error}</Text>
       </View>
     );
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
-      {/* Gradient Header */}
-      <View style={styles.gradientHeader}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Header with hamburger */}
+      <View style={[styles.gradientHeader, { backgroundColor: colors.header }]}>
+        {openMenu && (
+          <TouchableOpacity style={{ position: 'absolute', left: 18, top: 50, zIndex: 10 }} onPress={openMenu}>
+            <Ionicons name="menu" size={26} color="#fff" />
+          </TouchableOpacity>
+        )}
         <Text style={styles.headerText}>Home</Text>
       </View>
       {/* Section Title */}
-      <Text style={styles.sectionTitle}>Previous workouts</Text>
-      <View style={styles.sectionUnderline} />
+      <Text style={[styles.sectionTitle, { color: colors.text }]}>Previous workouts</Text>
+      <View style={[styles.sectionUnderline, { backgroundColor: colors.border }]} />
       <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 40 }}>
         {workouts.length === 0 ? (
-          <Text style={{ marginTop: 40 }}>No workouts found.</Text>
+          <Text style={{ marginTop: 40, color: colors.subText }}>No workouts found.</Text>
         ) : (
           workouts.map((workout) => {
             // Format date
@@ -90,21 +83,27 @@ export default function PreviousWorkouts({ navigation }) {
               }
             }
             return (
-              <View key={workout.id} style={styles.card}>
-                <Text style={styles.cardTitle}>{workout.workoutTitle || 'No title'}</Text>
-                <View style={styles.cardDivider} />
+              <View key={workout.id} style={[styles.card, { backgroundColor: colors.card }]}>
+                <Text style={[styles.cardTitle, { color: colors.text }]}>{workout.workoutTitle || 'No title'}</Text>
+                <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />
                 <View style={styles.rowBetween}>
-                  <View style={styles.pill}><Text style={styles.pillLabel}>Date</Text><Text style={styles.pillValue}>{formattedDate}</Text></View>
-                  <View style={styles.pill}><Text style={styles.pillLabel}>Duration</Text><Text style={styles.pillValue}>{formattedDuration}</Text></View>
+                  <View style={[styles.pill, { backgroundColor: colors.inputBg }]}>
+                    <Text style={[styles.pillLabel, { color: colors.subText }]}>Date</Text>
+                    <Text style={[styles.pillValue, { color: colors.text }]}>{formattedDate}</Text>
+                  </View>
+                  <View style={[styles.pill, { backgroundColor: colors.inputBg }]}>
+                    <Text style={[styles.pillLabel, { color: colors.subText }]}>Duration</Text>
+                    <Text style={[styles.pillValue, { color: colors.text }]}>{formattedDuration}</Text>
+                  </View>
                 </View>
-                <View style={styles.cardDivider} />
+                <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />
                 <View style={{ marginVertical: 10 }}>
                   {Array.isArray(workout.exercises) && workout.exercises.map((ex, idx) => (
-                    <Text key={idx} style={styles.exerciseText}>{`${ex.sets} x ${ex.reps} ${ex.name}`}</Text>
+                    <Text key={idx} style={[styles.exerciseText, { color: colors.text }]}>{`${ex.sets} x ${ex.reps} ${ex.name}`}</Text>
                   ))}
                 </View>
-                <TouchableOpacity style={styles.viewButton} onPress={() => navigation.navigate('ViewPreviousWorkout', { workout })}>
-                  <Text style={styles.viewButtonText}>View</Text>
+                <TouchableOpacity style={[styles.viewButton, { backgroundColor: isDarkMode ? '#fff' : '#232526' }]} onPress={() => navigation.navigate('ViewPreviousWorkout', { workout })}>
+                  <Text style={[styles.viewButtonText, { color: isDarkMode ? '#232526' : '#fff' }]}>View</Text>
                 </TouchableOpacity>
               </View>
             );

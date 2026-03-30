@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, Activi
 import styles from './gymbuddystyles';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
+import { useDarkMode } from '../../context/DarkModeContext';
 /*
 How it would work:
 
@@ -24,6 +25,8 @@ A button in GymBuddy to trigger this.
 
 */
 export default function GymBuddy() {
+
+  const { colors } = useDarkMode();
 
   // useState for chat messages, initialized with a welcome message from the bot
   let [messages, setMessages] = useState([
@@ -233,8 +236,8 @@ export default function GymBuddy() {
 
   return (
     // Main container
-    <View style={styles.container}>
-      <Text style={styles.title}>GYM Buddy</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.text }]}>GYM Buddy</Text>
       {/* Feedback Button */}
       <TouchableOpacity style={{ backgroundColor: '#007AFF', padding: 10, borderRadius: 8, marginBottom: 10, alignSelf: 'center' }} onPress={getFeedbackOnLastWorkout}>
         <Text style={{ color: 'white', fontWeight: 'bold' }}>Get Feedback on My Last Workout</Text>
@@ -272,16 +275,16 @@ export default function GymBuddy() {
 
 
       {/* Quick questions container */}
-      <View style={styles.quickTipsContainer}>
-        <Text style={styles.quickTipsTitle}>Quick Questions:</Text>
+      <View style={[styles.quickTipsContainer, { backgroundColor: colors.background }]}>
+        <Text style={[styles.quickTipsTitle, { color: colors.text }]}>Quick Questions:</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {quickTips.map((tip, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.quickTipButton}
+              style={[styles.quickTipButton, { backgroundColor: colors.inputBg }]}
               onPress={() => sendMessage(tip)}
             >
-              <Text style={styles.quickTipText}>{tip}</Text>
+              <Text style={[styles.quickTipText, { color: colors.text }]}>{tip}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -292,12 +295,13 @@ export default function GymBuddy() {
 
 
       {/* Input container for user messages */}
-      <View style={styles.inputContainer}>
+      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
           value={inputText}
           onChangeText={setInputText}
           placeholder="Ask your GYM Buddy anything..."
+          placeholderTextColor={colors.subText}
           multiline
         />
         <TouchableOpacity

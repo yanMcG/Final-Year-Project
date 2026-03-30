@@ -5,10 +5,12 @@ import { addDoc, collection } from 'firebase/firestore';
 
 import { db } from '../../../firebase/firebase';
 import styles from './wokroutInProgressStyles';
+import { useDarkMode } from '../../../context/DarkModeContext';
 
 
 
 export default function WorkoutInProgress({ route, navigation }) {
+  const { colors, isDarkMode } = useDarkMode();
   // If no exercises are passed via route params, use default exercises
   const defaultExercises = [
     { id: 1, name: 'Barbell Bench Press', sets: 1 },
@@ -122,9 +124,9 @@ export default function WorkoutInProgress({ route, navigation }) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Dark Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.header }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={26} color="#fff" />
         </TouchableOpacity>
@@ -132,10 +134,10 @@ export default function WorkoutInProgress({ route, navigation }) {
       </View>
 
       {/* Timer and Discard Row */}
-      <View style={styles.timerRow}>
+      <View style={[styles.timerRow, { backgroundColor: colors.background }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Ionicons name="time-outline" size={20} color="#232526" />
-          <Text style={styles.timerText}>{formatTime(elapsed)}</Text>
+          <Ionicons name="time-outline" size={20} color={colors.text} />
+          <Text style={[styles.timerText, { color: colors.text }]}>{formatTime(elapsed)}</Text>
         </View>
         <TouchableOpacity onPress={() => {
           Alert.alert('Discard Workout', 'Are you sure you want to discard this workout?', [
@@ -143,44 +145,46 @@ export default function WorkoutInProgress({ route, navigation }) {
             { text: 'Discard', style: 'destructive', onPress: () => navigation.goBack() },
           ]);
         }}>
-          <Ionicons name="trash-outline" size={22} color="#232526" />
+          <Ionicons name="trash-outline" size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 40 }}>
         {/* Exercise Cards */}
         {exercises.map((ex) => (
-          <View key={ex.id} style={styles.card}>
-            <Text style={styles.exerciseName}>{ex.name}</Text>
-            <View style={styles.cardDivider} />
+          <View key={ex.id} style={[styles.card, { backgroundColor: colors.card }]}>
+            <Text style={[styles.exerciseName, { color: colors.text }]}>{ex.name}</Text>
+            <View style={[styles.cardDivider, { backgroundColor: colors.border }]} />
             {/* Table Header */}
             <View style={styles.tableRow}>
-              <Text style={styles.tableHeader}>set</Text>
-              <Text style={styles.tableHeader}>weight</Text>
-              <Text style={styles.tableHeader}>reps</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>set</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>weight</Text>
+              <Text style={[styles.tableHeader, { color: colors.subText }]}>reps</Text>
             </View>
             {/* One row per set */}
             {Array.from({ length: ex.sets || 1 }).map((_, setIdx) => (
               <View key={setIdx} style={styles.tableRow}>
-                <Text style={styles.tableCell}>{setIdx + 1}</Text>
+                <Text style={[styles.tableCell, { color: colors.text }]}>{setIdx + 1}</Text>
                 <View style={styles.tableCellInput}>
                   <TextInput
-                    style={styles.cellInput}
+                    style={[styles.cellInput, { color: colors.text, borderBottomColor: colors.inputBorder }]}
                     keyboardType="numeric"
                     value={weights[ex.id]}
                     onChangeText={(text) => handleWeightChange(ex.id, text)}
                     placeholder="0"
+                    placeholderTextColor={colors.subText}
                     maxLength={5}
                     editable={!workoutEnded}
                   />
-                  <Text style={styles.cellUnit}>kg</Text>
+                  <Text style={[styles.cellUnit, { color: colors.subText }]}>kg</Text>
                 </View>
                 <TextInput
-                  style={styles.cellInput}
+                  style={[styles.cellInput, { color: colors.text, borderBottomColor: colors.inputBorder }]}
                   keyboardType="numeric"
                   value={reps[ex.id]}
                   onChangeText={(text) => handleChange(ex.id, text)}
                   placeholder="0"
+                  placeholderTextColor={colors.subText}
                   maxLength={3}
                   editable={!workoutEnded}
                 />
@@ -191,8 +195,8 @@ export default function WorkoutInProgress({ route, navigation }) {
 
         {/* Finish Workout Button */}
         {!workoutEnded && (
-          <TouchableOpacity style={styles.finishButton} onPress={handleEndWorkout} disabled={saving}>
-            <Text style={styles.finishButtonText}>{saving ? 'Saving...' : 'Finish Workout'}</Text>
+          <TouchableOpacity style={[styles.finishButton, { backgroundColor: isDarkMode ? '#fff' : '#232526' }]} onPress={handleEndWorkout} disabled={saving}>
+            <Text style={[styles.finishButtonText, { color: isDarkMode ? '#232526' : '#fff' }]}>{saving ? 'Saving...' : 'Finish Workout'}</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
