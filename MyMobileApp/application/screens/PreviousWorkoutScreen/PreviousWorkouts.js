@@ -6,7 +6,7 @@ import { db } from '../../firebase/firebase';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './previousWorkoutStyles';
 
-export default function PreviousWorkouts() {
+export default function PreviousWorkouts({ navigation }) {
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -43,7 +43,6 @@ export default function PreviousWorkouts() {
   if (loading) {
     return (
       <View style={globalStyles.container}>
-        <Text style={globalStyles.title}>Previous Workouts</Text>
         <Text>Loading...</Text>
       </View>
     );
@@ -52,7 +51,6 @@ export default function PreviousWorkouts() {
   if (error) {
     return (
       <View style={globalStyles.container}>
-        <Text style={globalStyles.title}>Previous Workouts</Text>
         <Text style={{ color: 'red' }}>{error}</Text>
       </View>
     );
@@ -81,9 +79,13 @@ export default function PreviousWorkouts() {
             // Format duration
             let formattedDuration = 'No duration';
             if (typeof workout.duration === 'number') {
-              const m = Math.floor(workout.duration / 60);
-              const s = workout.duration % 60;
-              formattedDuration = `${m}h ${s}min`;
+              const h = Math.floor(workout.duration / 3600);
+              const min = Math.floor((workout.duration % 3600) / 60);
+              if (h > 0) {
+                formattedDuration = `${h}h ${min}min`;
+              } else {
+                formattedDuration = `${min}min`;
+              }
             }
             return (
               <View key={workout.id} style={styles.card}>
@@ -99,7 +101,7 @@ export default function PreviousWorkouts() {
                     <Text key={idx} style={styles.exerciseText}>{`${ex.sets} x ${ex.reps} ${ex.name}`}</Text>
                   ))}
                 </View>
-                <TouchableOpacity style={styles.viewButton} onPress={() => Alert.alert('Workout Details', 'Feature coming soon!')}>
+                <TouchableOpacity style={styles.viewButton} onPress={() => navigation.navigate('ViewPreviousWorkout', { workout })}>
                   <Text style={styles.viewButtonText}>View</Text>
                 </TouchableOpacity>
               </View>

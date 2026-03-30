@@ -10,6 +10,7 @@ import PreviousWorkouts from './screens/PreviousWorkoutScreen/PreviousWorkouts';
 import StartWorkout from './screens/startWorkoutScreen/StartWorkout';
 import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
 import WorkoutInProgress from './screens/startWorkoutScreen/wokroutInProgress/WorkoutInProgress';
+import ViewPreviousWorkout from './screens/PreviousWorkoutScreen/ViewWorkout/ViewPreviousWorkout';
 
 // Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
@@ -54,6 +55,11 @@ export default function App() {
           name="WorkoutInProgress"
           component={WorkoutInProgress}
           options={{ tabBarButton: () => null }}
+        />
+        <Tab.Screen
+          name="ViewPreviousWorkout"
+          component={ViewPreviousWorkout}
+          options={{ tabBarButton: () => null, headerShown: false }}
         />
       </Tab.Navigator>
       <StatusBar style="light" />
