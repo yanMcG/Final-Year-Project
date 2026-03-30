@@ -1,47 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import globalStyles from '../../globalStyles';
 import { collection, getDocs, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
-import { getReps, uploadReps } from '../../firebase/firebase';
 import { db } from '../../firebase/firebase';
+import { Ionicons } from '@expo/vector-icons';
 import styles from './previousWorkoutStyles';
 
-
-// This screen will show a list of previous workouts stored in Firestore
-async function getWorkouts() {
-  const querySnapshot = await getDocs(collection(db, 'workouts'));
-  const workouts = [];
-  querySnapshot.forEach((doc) => {
-    workouts.push({ id: doc.id, ...doc.data() });
-  });
-  return workouts;
-}
-
-
 export default function PreviousWorkouts() {
-  // State variables for workouts, loading state, error messages, and reps input
   const [workouts, setWorkouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentReps, setCurrentReps] = useState(0);
-  const [newReps, setNewReps] = useState('');
 
-  // Fetch current reps from Firestore on component mount
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        let result = await getReps();
-        setCurrentReps(result);
-      } catch (err) {
-        setError('Failed to load reps.');
-        console.error(err);
-      }
-    };
-    getData();
-  }, []);
-
-
-  
   // Real-time Firestore listener for workouts
   useEffect(() => {
     setLoading(true);
@@ -56,18 +25,6 @@ export default function PreviousWorkouts() {
     });
     return unsubscribe;
   }, []);
-
-  // Handle form submission to update reps in Firestore
-  const handleFormSubmission = async () => {
-    try {
-      await uploadReps(newReps);
-      setCurrentReps(newReps);
-      setNewReps('');
-    } catch (err) {
-      setError('Failed to update reps.');
-      console.error(err);
-    }
-  };
 
   // Remove all workouts from Firestore
   const handleRemoveData = async () => {
@@ -102,49 +59,54 @@ export default function PreviousWorkouts() {
   }
 
   return (
-    <View style={globalStyles.container}>
-      {/* Remove Data Button */}
-      <TouchableOpacity onPress={handleRemoveData} style={{ backgroundColor: '#ff3b30', padding: 10, borderRadius: 8, marginBottom: 10, alignSelf: 'center' }}>
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>Remove Data</Text>
-      </TouchableOpacity>
-      <Text style={globalStyles.title}>Previous Workouts</Text>
-      {workouts.length === 0 ? (
-        <Text>No workouts found.</Text>
-      ) : (
-        <ScrollView style={styles.workoutList}>
-          {workouts.map((workout) => {
+    <View style={{ flex: 1, backgroundColor: '#f8f9fa' }}>
+      {/* Gradient Header */}
+      <View style={styles.gradientHeader}>
+        <Text style={styles.headerText}>Home</Text>
+      </View>
+      {/* Section Title */}
+      <Text style={styles.sectionTitle}>Previous workouts</Text>
+      <View style={styles.sectionUnderline} />
+      <ScrollView contentContainerStyle={{ alignItems: 'center', paddingBottom: 40 }}>
+        {workouts.length === 0 ? (
+          <Text style={{ marginTop: 40 }}>No workouts found.</Text>
+        ) : (
+          workouts.map((workout) => {
             // Format date
             let formattedDate = 'No date';
             if (workout.date) {
               const d = new Date(workout.date);
-              formattedDate = d.toLocaleString('en-GB', {
-                day: '2-digit', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit', second: '2-digit',
-                timeZone: 'GMT',
-                hour12: false
-              });
+              formattedDate = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             }
             // Format duration
             let formattedDuration = 'No duration';
             if (typeof workout.duration === 'number') {
-              const m = Math.floor(workout.duration / 60).toString().padStart(2, '0');
-              const s = (workout.duration % 60).toString().padStart(2, '0');
-              formattedDuration = `${m}:${s}`;
+              const m = Math.floor(workout.duration / 60);
+              const s = workout.duration % 60;
+              formattedDuration = `${m}h ${s}min`;
             }
             return (
-              <View key={workout.id} style={styles.workoutItem}>
-                <Text style={{ fontWeight: 'bold', fontSize: 20, marginBottom: 4 }}>
-                  {workout.workoutTitle || 'No title'}
-                </Text>
-                <Text style={styles.workoutDate}>{formattedDate}</Text>
-                <Text style={styles.workoutDuration}>Duration: {formattedDuration}</Text>
+              <View key={workout.id} style={styles.card}>
+                <Text style={styles.cardTitle}>{workout.workoutTitle || 'No title'}</Text>
+                <View style={styles.cardDivider} />
+                <View style={styles.rowBetween}>
+                  <View style={styles.pill}><Text style={styles.pillLabel}>Date</Text><Text style={styles.pillValue}>{formattedDate}</Text></View>
+                  <View style={styles.pill}><Text style={styles.pillLabel}>Duration</Text><Text style={styles.pillValue}>{formattedDuration}</Text></View>
+                </View>
+                <View style={styles.cardDivider} />
+                <View style={{ marginVertical: 10 }}>
+                  {Array.isArray(workout.exercises) && workout.exercises.map((ex, idx) => (
+                    <Text key={idx} style={styles.exerciseText}>{`${ex.sets} x ${ex.reps} ${ex.name}`}</Text>
+                  ))}
+                </View>
+                <TouchableOpacity style={styles.viewButton} onPress={() => Alert.alert('Workout Details', 'Feature coming soon!')}>
+                  <Text style={styles.viewButtonText}>View</Text>
+                </TouchableOpacity>
               </View>
             );
-          })}
-        </ScrollView>
-      )}
-
-   
+          })
+        )}
+      </ScrollView>
     </View>
   );
 }
