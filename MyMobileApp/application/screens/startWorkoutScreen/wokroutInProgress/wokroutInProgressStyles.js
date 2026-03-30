@@ -1,75 +1,124 @@
 import { StyleSheet } from 'react-native';
-import globalStyles from '../../../globalStyles';
 
 const styles = StyleSheet.create({
-  container: {
-    ...globalStyles.container,
-    backgroundColor: '#fff',
-    padding: 20,
+  header: {
+    width: '100%',
+    paddingTop: 50,
+    paddingBottom: 20,
+    backgroundColor: '#232526',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
-  title: {
-    ...globalStyles.title,
-    color: '#111',
-    marginBottom: 12,
+  backButton: {
+    position: 'absolute',
+    left: 18,
+    top: 50,
+    zIndex: 10,
   },
-  list: {
-    flex: 1,
-  },
-  card: {
-    ...globalStyles.card,
-    padding: 16,
-    borderRadius: 12,
-  },
-  exerciseName: {
-    fontSize: 18,
+  headerTitle: {
+    fontSize: 32,
+    color: '#fff',
     fontWeight: 'bold',
-    color: '#111',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
-  exerciseInfo: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  inputRow: {
+  timerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 22,
+    paddingVertical: 12,
   },
-  label: {
-    fontSize: 16,
-    color: '#111',
+  timerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#232526',
+    marginLeft: 6,
   },
-  input: {
-    width: 80,
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 8,
-    textAlign: 'center',
-    backgroundColor: '#fafafa',
-  },
-  endButton: {
-    ...globalStyles.button,
-    padding: 14,
-    borderRadius: 10,
-    marginTop: 10,
-  },
-  endButtonText: {
-    ...globalStyles.buttonText,
-    fontSize: 16,
-  },
-  cancelButton: {
+  card: {
     backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderRadius: 16,
+    padding: 18,
+    marginTop: 14,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    alignSelf: 'center',
   },
-  cancelButtonText: {
-    color: '#111',
-    fontSize: 15,
+  exerciseName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#232526',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  cardDivider: {
+    height: 2,
+    backgroundColor: '#e0e0e0',
+    width: '100%',
+    marginBottom: 8,
+  },
+  tableRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: 6,
+  },
+  tableHeader: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 13,
+    color: '#888',
+    fontWeight: '600',
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 17,
+    color: '#232526',
+    fontWeight: '600',
+  },
+  tableCellInput: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cellInput: {
+    width: 50,
+    height: 36,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#232526',
+    fontWeight: '500',
+    backgroundColor: 'transparent',
+  },
+  cellUnit: {
+    fontSize: 14,
+    color: '#888',
+    marginLeft: 2,
+  },
+  finishButton: {
+    backgroundColor: '#232526',
+    borderRadius: 28,
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    marginTop: 24,
+    alignItems: 'center',
+    width: '80%',
+    alignSelf: 'center',
+  },
+  finishButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

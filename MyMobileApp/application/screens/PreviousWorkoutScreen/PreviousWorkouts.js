@@ -16,6 +16,8 @@ export default function PreviousWorkouts({ navigation }) {
     setLoading(true);
     const unsubscribe = onSnapshot(collection(db, 'workouts'), (snapshot) => {
       const workoutsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Sort by date, newest first
+      workoutsData.sort((a, b) => new Date(b.date) - new Date(a.date));
       setWorkouts(workoutsData);
       setLoading(false);
     }, (err) => {
