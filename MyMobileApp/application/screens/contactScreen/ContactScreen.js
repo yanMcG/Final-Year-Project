@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-// ─── Update these details with your own ───────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 const CONTACT = {
   name: 'Ryan Mc Glynn',
   role: 'Computer Scientist',
@@ -19,8 +19,7 @@ const CONTACT = {
   phone: '+353 83 042 2366',
   github: 'https://github.com/yanMcG',
   linkedin: 'https://www.linkedin.com/in/ryan-mc-glynn-8a0a84254/',
-  // Paste the direct link to your CV/resume (Google Drive, Dropbox, personal site, etc.)
-  cvUrl: 'https://example.com/your-cv.pdf',
+  //cvUrl: 'https://canva.link/3u4c3mn59b1pyvh',
 };
 // ─────────────────────────────────────────────────────────────────────────────
 
