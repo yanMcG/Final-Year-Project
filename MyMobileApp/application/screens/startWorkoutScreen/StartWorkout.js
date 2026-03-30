@@ -1,46 +1,65 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import globalStyles from '../../globalStyles';
 import styles from './startWorkoutStyles';
 import { useDarkMode } from '../../context/DarkModeContext';
 
-// This screen will show a the wokrout routine predefined
+// Predefined workout routines
+const workoutTypes = [
+  {
+    id: 1,
+    name: 'Full Body',
+    exercises: [
+      { id: 1, name: 'Flat Barbell Bench Press', sets: 3 },
+      { id: 2, name: 'Smith Machine Squat', sets: 3 },
+      { id: 3, name: 'Barbell Deadlift', sets: 3 },
+    ],
+  },
+];
+
 export default function StartWorkout({ navigation }) {
   const { colors, isDarkMode } = useDarkMode();
 
-  const workoutTypes = [
-    { id: 1, name: 'Full Body', duration: '30 min', exercises: 3},
-  ];
-
-
-// When user clicks on a workout type, we navigate to the WorkoutInProgress screen and pass the workout
   const startWorkout = (workout) => {
-    const exercises = [
-      { id: 1, name: 'Barbell Bench Press', sets: 1 },
-      { id: 2, name: 'Barbell Squat', sets: 1 },
-      { id: 3, name: 'Pull Up', sets: 1 },
-    ];
-    navigation.navigate('WorkoutInProgress', { workout, exercises });
+    navigation.navigate('WorkoutInProgress', { workout, exercises: workout.exercises });
   };
 
-  // This screen will show a list of workout types (e.g., Full Body, Upper Body, etc.)
   return (
-    <View style={[globalStyles.container, { backgroundColor: colors.background }]}>
-      <Text style={[globalStyles.title, { color: colors.text }]}>Start a Workout</Text>
-      <ScrollView style={styles.workoutList}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Dark "Routines" Header */}
+      <View style={[styles.header, { backgroundColor: colors.header }]}>
+        <Text style={styles.headerText}>Routines</Text>
+      </View>
+
+      <ScrollView style={styles.workoutList} contentContainerStyle={{ paddingBottom: 40 }}>
         {workoutTypes.map((workout) => (
-          <TouchableOpacity
-            key={workout.id}
-            style={[styles.workoutCard, { backgroundColor: colors.card }]}
-            onPress={() => startWorkout(workout)}
-          >
+          <View key={workout.id} style={[styles.workoutCard, { backgroundColor: colors.card }]}>
+            {/* Workout title */}
             <Text style={[styles.workoutName, { color: colors.text }]}>{workout.name}</Text>
-            <Text style={[styles.workoutInfo, { color: colors.subText }]}>Duration: {workout.duration}</Text>
-            <Text style={[styles.workoutInfo, { color: colors.subText }]}>Exercises: {workout.exercises}</Text>
-            <View style={[globalStyles.button, { backgroundColor: isDarkMode ? '#fff' : '#111' }]}>
-              <Text style={[globalStyles.buttonText, { color: isDarkMode ? '#111' : '#fff' }]}>Start Workout</Text>
-            </View>
-          </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            {/* Exercise list */}
+            {workout.exercises.map((ex) => (
+              <Text
+                key={ex.id}
+                style={[styles.exerciseItem, { color: colors.text }]}
+              >
+                {ex.name}
+              </Text>
+            ))}
+
+            {/* Start Button */}
+            <TouchableOpacity
+              style={[styles.startButton, { backgroundColor: isDarkMode ? '#fff' : '#1a1a1a' }]}
+              onPress={() => startWorkout(workout)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.startButtonText, { color: isDarkMode ? '#1a1a1a' : '#fff' }]}>
+                Start
+              </Text>
+            </TouchableOpacity>
+          </View>
         ))}
       </ScrollView>
     </View>
