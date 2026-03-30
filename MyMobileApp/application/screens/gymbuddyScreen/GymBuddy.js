@@ -25,7 +25,7 @@ A function to fetch the latest workout from Firestore.
 A button in GymBuddy to trigger this.
 
 */
-export default function GymBuddy() {
+export default function GymBuddy({ openMenu }) {
 
   const { colors, isDarkMode } = useDarkMode();
   const scrollViewRef = useRef(null);
@@ -241,6 +241,11 @@ export default function GymBuddy() {
 
       {/* Dark "Gym Buddy" Header */}
       <View style={[styles.header, { backgroundColor: colors.header }]}>
+        {openMenu && (
+          <TouchableOpacity style={{ position: 'absolute', left: 18, top: 50, zIndex: 10 }} onPress={openMenu}>
+            <Ionicons name="menu" size={26} color="#fff" />
+          </TouchableOpacity>
+        )}
         <Text style={styles.headerText}>Gym Buddy</Text>
       </View>
 

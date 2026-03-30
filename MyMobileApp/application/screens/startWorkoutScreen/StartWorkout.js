@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import styles from './startWorkoutStyles';
 import { useDarkMode } from '../../context/DarkModeContext';
 
@@ -16,7 +17,7 @@ const workoutTypes = [
   },
 ];
 
-export default function StartWorkout({ navigation }) {
+export default function StartWorkout({ navigation, openMenu }) {
   const { colors, isDarkMode } = useDarkMode();
 
   const startWorkout = (workout) => {
@@ -27,6 +28,11 @@ export default function StartWorkout({ navigation }) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Dark "Routines" Header */}
       <View style={[styles.header, { backgroundColor: colors.header }]}>
+        {openMenu && (
+          <TouchableOpacity style={{ position: 'absolute', left: 18, top: 50, zIndex: 10 }} onPress={openMenu}>
+            <Ionicons name="menu" size={26} color="#fff" />
+          </TouchableOpacity>
+        )}
         <Text style={styles.headerText}>Routines</Text>
       </View>
 

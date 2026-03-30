@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import globalStyles from './globalStyles';
 import { DarkModeProvider, useDarkMode } from './context/DarkModeContext';
 import SideMenu from './components/SideMenu';
 
-// Import our screen components
+// Screen imports
 import PreviousWorkouts from './screens/PreviousWorkoutScreen/PreviousWorkouts';
 import StartWorkout from './screens/startWorkoutScreen/StartWorkout';
 import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
@@ -17,8 +16,42 @@ import ViewPreviousWorkout from './screens/PreviousWorkoutScreen/ViewWorkout/Vie
 import SettingsScreen from './screens/settingsScreen/SettingsScreen';
 import ContactScreen from './screens/contactScreen/ContactScreen';
 
-// Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
+
+// Icon + label config for the three visible tabs
+const TAB_CONFIG = {
+  'Previous Workouts': { active: 'home',                inactive: 'home-outline',                label: 'Home' },
+  'Start Workout':     { active: 'barbell',             inactive: 'barbell-outline',             label: 'Routines' },
+  'GYM Buddy':         { active: 'chatbubble-ellipses', inactive: 'chatbubble-ellipses-outline', label: 'Chat' },
+};
+
+// Custom tab bar — width:'100%' + flex:1 per item ensures perfectly even
+// distribution across the entire screen width on all device and desktop sizes.
+function CustomTabBar({ state, navigation: nav, colors }) {
+  const visibleRoutes = state.routes.filter((r) => TAB_CONFIG[r.name]);
+
+  return (
+    <View style={[tabStyles.tabBar, { backgroundColor: colors.tabBar, borderTopColor: colors.border }]}>
+      {visibleRoutes.map((route) => {
+        const isFocused = state.routes[state.index]?.name === route.name;
+        const tint = isFocused ? colors.tabBarActive : colors.tabBarInactive;
+        const cfg = TAB_CONFIG[route.name];
+
+        return (
+          <TouchableOpacity
+            key={route.key}
+            style={tabStyles.tabItem}
+            onPress={() => nav.navigate(route.name)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name={isFocused ? cfg.active : cfg.inactive} size={24} color={tint} />
+            <Text style={[tabStyles.label, { color: tint }]}>{cfg.label}</Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
 
 function AppContent() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -29,67 +62,28 @@ function AppContent() {
     <View style={{ flex: 1 }}>
       <NavigationContainer ref={navigationRef}>
         <Tab.Navigator
-          screenOptions={({ route }) => ({
-            tabBarIcon: ({ focused, color, size }) => {
-              let iconName;
-              if (route.name === 'Previous Workouts') {
-                iconName = focused ? 'home' : 'home-outline';
-              } else if (route.name === 'Start Workout') {
-                iconName = focused ? 'play-circle' : 'play-circle-outline';
-              } else if (route.name === 'GYM Buddy') {
-                iconName = focused ? 'chatbubbles' : 'chatbubbles-outline';
-              }
-              if (!iconName) iconName = 'ellipse';
-              return <Ionicons name={iconName} size={size} color={color} />;
-            },
-            tabBarActiveTintColor: colors.tabBarActive,
-            tabBarInactiveTintColor: colors.tabBarInactive,
-            tabBarStyle: { backgroundColor: colors.tabBar },
-            headerStyle: { backgroundColor: colors.header },
-            headerTintColor: '#fff',
-            headerTitleStyle: { fontWeight: 'bold' },
-            headerLeft: () => (
-              <TouchableOpacity
-                style={{ marginLeft: 16 }}
-                onPress={() => setMenuVisible(true)}
-              >
-                <Ionicons name="menu" size={26} color="#fff" />
-              </TouchableOpacity>
-            ),
-          })}
+          screenOptions={{ headerShown: false }}
+          tabBar={(props) => <CustomTabBar {...props} colors={colors} />}
         >
-          <Tab.Screen
-            name="Previous Workouts"
-            options={{ headerShown: false }}
-          >
+          {/* Visible tabs — openMenu passes hamburger control to each screen's own header */}
+          <Tab.Screen name="Previous Workouts">
             {(props) => <PreviousWorkouts {...props} openMenu={() => setMenuVisible(true)} />}
           </Tab.Screen>
-          <Tab.Screen name="Start Workout" component={StartWorkout} />
-          <Tab.Screen name="GYM Buddy" component={GymBuddy} />
-          <Tab.Screen
-            name="WorkoutInProgress"
-            component={WorkoutInProgress}
-            options={{ tabBarButton: () => null, headerShown: false }}
-          />
-          <Tab.Screen
-            name="ViewPreviousWorkout"
-            component={ViewPreviousWorkout}
-            options={{ tabBarButton: () => null, headerShown: false }}
-          />
-          <Tab.Screen
-            name="Settings"
-            component={SettingsScreen}
-            options={{ tabBarButton: () => null, headerShown: false }}
-          />
-          <Tab.Screen
-            name="Contact"
-            component={ContactScreen}
-            options={{ tabBarButton: () => null, headerShown: false }}
-          />
+          <Tab.Screen name="Start Workout">
+            {(props) => <StartWorkout {...props} openMenu={() => setMenuVisible(true)} />}
+          </Tab.Screen>
+          <Tab.Screen name="GYM Buddy">
+            {(props) => <GymBuddy {...props} openMenu={() => setMenuVisible(true)} />}
+          </Tab.Screen>
+
+          {/* Hidden screens — no tab bar button */}
+          <Tab.Screen name="WorkoutInProgress"   component={WorkoutInProgress}   options={{ tabBarButton: () => null }} />
+          <Tab.Screen name="ViewPreviousWorkout" component={ViewPreviousWorkout} options={{ tabBarButton: () => null }} />
+          <Tab.Screen name="Settings"            component={SettingsScreen}      options={{ tabBarButton: () => null }} />
+          <Tab.Screen name="Contact"             component={ContactScreen}       options={{ tabBarButton: () => null }} />
         </Tab.Navigator>
       </NavigationContainer>
 
-      {/* Side Menu Overlay */}
       <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
@@ -101,7 +95,6 @@ function AppContent() {
   );
 }
 
-// Main App component
 export default function App() {
   return (
     <DarkModeProvider>
@@ -109,3 +102,24 @@ export default function App() {
     </DarkModeProvider>
   );
 }
+
+const tabStyles = StyleSheet.create({
+  tabBar: {
+    flexDirection: 'row',
+    width: '100%',           // ensures full-width on desktop/web
+    height: 60,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingBottom: 8,
+    paddingTop: 6,
+  },
+  tabItem: {
+    flex: 1,                 // each item takes an equal share of the full width
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 3,
+  },
+});
