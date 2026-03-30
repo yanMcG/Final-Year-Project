@@ -15,6 +15,7 @@ import GymBuddy from './screens/gymbuddyScreen/GymBuddy';
 import WorkoutInProgress from './screens/startWorkoutScreen/wokroutInProgress/WorkoutInProgress';
 import ViewPreviousWorkout from './screens/PreviousWorkoutScreen/ViewWorkout/ViewPreviousWorkout';
 import SettingsScreen from './screens/settingsScreen/SettingsScreen';
+import ContactScreen from './screens/contactScreen/ContactScreen';
 
 // Create the bottom tab navigator that will hold our screens
 const Tab = createBottomTabNavigator();
@@ -78,6 +79,11 @@ function AppContent() {
           <Tab.Screen
             name="Settings"
             component={SettingsScreen}
+            options={{ tabBarButton: () => null, headerShown: false }}
+          />
+          <Tab.Screen
+            name="Contact"
+            component={ContactScreen}
             options={{ tabBarButton: () => null, headerShown: false }}
           />
         </Tab.Navigator>

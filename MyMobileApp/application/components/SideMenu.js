@@ -49,6 +49,17 @@ export default function SideMenu({ visible, onClose, navigation }) {
             <Ionicons name="settings" size={24} color="#999" />
             <Text style={[styles.menuItemText, { color: colors.text }]}>Settings</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              onClose();
+              navigation.navigate('Contact');
+            }}
+          >
+            <Ionicons name="person-circle-outline" size={26} color="#999" />
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Contact</Text>
+          </TouchableOpacity>
         </View>
       </Animated.View>
     </View>
