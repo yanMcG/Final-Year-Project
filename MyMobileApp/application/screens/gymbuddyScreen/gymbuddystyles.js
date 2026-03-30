@@ -1,90 +1,120 @@
 import { StyleSheet } from 'react-native';
-import globalStyles from '../../globalStyles';
 
 let styles = StyleSheet.create({
   container: {
-    ...globalStyles.container,
-    backgroundColor: '#fff',
+    flex: 1,
   },
-  title: {
-    ...globalStyles.title,
-    color: '#111',
-    paddingTop: 20,
-    paddingBottom: 10,
+  // Dark header matching the Routines page style
+  header: {
+    width: '100%',
+    paddingTop: 54,
+    paddingBottom: 22,
+    backgroundColor: '#1a1a1a',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
+  headerText: {
+    fontSize: 36,
+    color: '#fff',
+    fontWeight: 'bold',
+    letterSpacing: 1,
+  },
+  // Feedback button strip below header
+  feedbackBar: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  feedbackButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    alignSelf: 'center',
+  },
+  feedbackButtonText: {
+    fontWeight: '600',
+    fontSize: 14,
+    marginLeft: 6,
+  },
+  // Scrollable chat area
   chatContainer: {
     flex: 1,
-    padding: 15,
+    paddingHorizontal: 16,
+    paddingTop: 10,
   },
+  // Base bubble style
   messageContainer: {
     marginVertical: 5,
-    padding: 12,
-    borderRadius: 15,
-    maxWidth: '80%',
+    padding: 14,
+    borderRadius: 20,
+    maxWidth: '78%',
   },
+  // Bot bubble — medium grey with white text (matching image left side)
   botMessage: {
-    backgroundColor: '#222',
+    backgroundColor: '#6b7280',
     alignSelf: 'flex-start',
+    borderBottomLeftRadius: 4,
   },
+  // User bubble — light lavender-grey with dark text (matching image right side)
   userMessage: {
-    backgroundColor: '#444',
+    backgroundColor: '#d1d5db',
     alignSelf: 'flex-end',
+    borderBottomRightRadius: 4,
   },
   messageText: {
-    fontSize: 16,
+    fontSize: 15,
+    lineHeight: 21,
   },
   botText: {
     color: '#fff',
   },
   userText: {
-    color: '#fff',
+    color: '#1f2937',
   },
+  // Quick tips horizontal scroll
   quickTipsContainer: {
-    padding: 15,
-    backgroundColor: '#fff',
-  },
-  quickTipsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#111',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    paddingTop: 4,
   },
   quickTipButton: {
-    backgroundColor: '#eee',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginRight: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 18,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   quickTipText: {
-    color: '#111',
+    fontSize: 13,
+    fontWeight: '500',
   },
+  // Bottom input bar
   inputContainer: {
     flexDirection: 'row',
-    padding: 15,
-    backgroundColor: '#fff',
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
   },
   textInput: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginRight: 10,
+    borderRadius: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
+    fontSize: 15,
     maxHeight: 100,
-    fontSize: 16,
+    marginRight: 10,
   },
+  // Icon-only send button (paper plane)
   sendButton: {
-    ...globalStyles.button,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 20,
-  },
-  sendButtonText: {
-    ...globalStyles.buttonText,
-    fontSize: 16,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

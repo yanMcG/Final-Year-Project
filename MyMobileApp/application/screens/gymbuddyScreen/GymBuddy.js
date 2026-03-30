@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import styles from './gymbuddystyles';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
@@ -26,7 +27,8 @@ A button in GymBuddy to trigger this.
 */
 export default function GymBuddy() {
 
-  const { colors } = useDarkMode();
+  const { colors, isDarkMode } = useDarkMode();
+  const scrollViewRef = useRef(null);
 
   // useState for chat messages, initialized with a welcome message from the bot
   let [messages, setMessages] = useState([
@@ -235,17 +237,34 @@ export default function GymBuddy() {
   };
 
   return (
-    // Main container
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>GYM Buddy</Text>
-      {/* Feedback Button */}
-      <TouchableOpacity style={{ backgroundColor: '#007AFF', padding: 10, borderRadius: 8, marginBottom: 10, alignSelf: 'center' }} onPress={getFeedbackOnLastWorkout}>
-        <Text style={{ color: 'white', fontWeight: 'bold' }}>Get Feedback on My Last Workout</Text>
-      </TouchableOpacity>
 
+      {/* Dark "Gym Buddy" Header */}
+      <View style={[styles.header, { backgroundColor: colors.header }]}>
+        <Text style={styles.headerText}>Gym Buddy</Text>
+      </View>
 
-      {/* Chat messages container */}
-      <ScrollView style={styles.chatContainer}>
+      {/* Generate Report Button */}
+      <View style={styles.feedbackBar}>
+        <TouchableOpacity
+          style={[styles.feedbackButton, { backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0' }]}
+          onPress={getFeedbackOnLastWorkout}
+          disabled={isLoading}
+        >
+          <Ionicons name="bar-chart-outline" size={16} color={isDarkMode ? '#aaa' : '#555'} />
+          <Text style={[styles.feedbackButtonText, { color: isDarkMode ? '#ccc' : '#333' }]}>
+            Generate Report from Last Workout
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Chat messages */}
+      <ScrollView
+        ref={scrollViewRef}
+        style={styles.chatContainer}
+        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        showsVerticalScrollIndicator={false}
+      >
         {messages.map((message) => (
           <View
             key={message.id}
@@ -264,53 +283,48 @@ export default function GymBuddy() {
         ))}
         {isLoading && (
           <View style={[styles.messageContainer, styles.botMessage]}>
-            <ActivityIndicator size="small" color="#fff" />
+            <ActivityIndicator size="small" color="#fff" style={{ marginBottom: 4 }} />
             <Text style={[styles.messageText, styles.botText]}>Thinking...</Text>
           </View>
         )}
       </ScrollView>
 
-
-
-
-
-      {/* Quick questions container */}
+      {/* Quick tip chips */}
       <View style={[styles.quickTipsContainer, { backgroundColor: colors.background }]}>
-        <Text style={[styles.quickTipsTitle, { color: colors.text }]}>Quick Questions:</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {quickTips.map((tip, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.quickTipButton, { backgroundColor: colors.inputBg }]}
+              style={[styles.quickTipButton, { backgroundColor: colors.inputBg, borderColor: colors.border }]}
               onPress={() => sendMessage(tip)}
             >
-              <Text style={[styles.quickTipText, { color: colors.text }]}>{tip}</Text>
+              <Text style={[styles.quickTipText, { color: colors.subText }]}>{tip}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-
-
-
-
-      {/* Input container for user messages */}
-      <View style={[styles.inputContainer, { backgroundColor: colors.background }]}>
+      {/* Input bar */}
+      <View style={[styles.inputContainer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
         <TextInput
-          style={[styles.textInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
+          style={[styles.textInput, { backgroundColor: colors.inputBg, color: colors.text }]}
           value={inputText}
           onChangeText={setInputText}
-          placeholder="Ask your GYM Buddy anything..."
+          placeholder="ask anything"
           placeholderTextColor={colors.subText}
           multiline
+          onSubmitEditing={() => sendMessage(inputText)}
+          returnKeyType="send"
         />
         <TouchableOpacity
-          style={styles.sendButton}
+          style={[styles.sendButton, { backgroundColor: isDarkMode ? '#fff' : '#1a1a1a' }]}
           onPress={() => sendMessage(inputText)}
+          disabled={isLoading}
         >
-          <Text style={styles.sendButtonText}>Send</Text>
+          <Ionicons name="paper-plane-outline" size={19} color={isDarkMode ? '#1a1a1a' : '#fff'} />
         </TouchableOpacity>
       </View>
+
     </View>
   );
 }
