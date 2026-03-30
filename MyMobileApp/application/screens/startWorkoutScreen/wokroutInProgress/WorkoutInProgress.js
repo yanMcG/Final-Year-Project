@@ -22,13 +22,18 @@ export default function WorkoutInProgress({ route, navigation }) {
   const exercises = route?.params?.exercises ?? defaultExercises;
   const workoutTitle = 'Full Body';
 
-  // Initialize reps and weight state for each exercise using their IDs as keys
+  // Initialize reps and weight state keyed by "exerciseId_setIndex"
+  // so each set row has its own independent value
   const initialReps = exercises.reduce((acc, ex) => {
-    acc[ex.id] = '';
+    Array.from({ length: ex.sets || 1 }).forEach((_, i) => {
+      acc[`${ex.id}_${i}`] = '';
+    });
     return acc;
   }, {});
   const initialWeights = exercises.reduce((acc, ex) => {
-    acc[ex.id] = '';
+    Array.from({ length: ex.sets || 1 }).forEach((_, i) => {
+      acc[`${ex.id}_${i}`] = '';
+    });
     return acc;
   }, {});
 
@@ -54,16 +59,16 @@ export default function WorkoutInProgress({ route, navigation }) {
 
 
 
-  // Handle changes to reps input, ensuring only numbers are allowed
-  const handleChange = (id, value) => {
+  // Handle changes to reps input — keyed by "exerciseId_setIndex"
+  const handleChange = (exId, setIdx, value) => {
     const sanitized = value.replace(/[^0-9]/g, '');
-    setReps((prev) => ({ ...prev, [id]: sanitized }));
+    setReps((prev) => ({ ...prev, [`${exId}_${setIdx}`]: sanitized }));
   };
 
-  // Handle changes to weight input, ensuring only numbers are allowed
-  const handleWeightChange = (id, value) => {
+  // Handle changes to weight input — keyed by "exerciseId_setIndex"
+  const handleWeightChange = (exId, setIdx, value) => {
     const sanitized = value.replace(/[^0-9.]/g, '');
-    setWeights((prev) => ({ ...prev, [id]: sanitized }));
+    setWeights((prev) => ({ ...prev, [`${exId}_${setIdx}`]: sanitized }));
   };
 
 
@@ -87,16 +92,23 @@ export default function WorkoutInProgress({ route, navigation }) {
       clearInterval(timerRef.current);
     }
 
-    // Prepare workout data to save - map exercises to include entered reps and weight
+    // Prepare workout data — each exercise stores an array of per-set results
     const results = exercises.map((ex) => ({
       name: ex.name,
       sets: ex.sets,
-      reps: reps[ex.id] === '' ? 0 : parseInt(reps[ex.id], 10),
-      weight: weights[ex.id] === '' ? 0 : parseFloat(weights[ex.id]),
+      // Build one entry per set so each set's weight/reps is stored independently
+      setData: Array.from({ length: ex.sets || 1 }).map((_, i) => ({
+        set: i + 1,
+        reps: reps[`${ex.id}_${i}`] === '' ? 0 : parseInt(reps[`${ex.id}_${i}`], 10),
+        weight: weights[`${ex.id}_${i}`] === '' ? 0 : parseFloat(weights[`${ex.id}_${i}`]),
+      })),
+      // Top-level reps/weight kept for backwards compatibility with ViewPreviousWorkout
+      reps: reps[`${ex.id}_0`] === '' ? 0 : parseInt(reps[`${ex.id}_0`], 10),
+      weight: weights[`${ex.id}_0`] === '' ? 0 : parseFloat(weights[`${ex.id}_0`]),
     }));
 
-    // simple validation: at least one rep entered
-    const anyEntered = results.some((r) => r.reps > 0);
+    // simple validation: at least one rep entered across any set
+    const anyEntered = results.some((r) => r.setData.some((s) => s.reps > 0));
     if (!anyEntered) {
       Alert.alert('No reps entered', 'Please enter reps for at least one exercise.');
       setSaving(false);
@@ -169,8 +181,8 @@ export default function WorkoutInProgress({ route, navigation }) {
                   <TextInput
                     style={[styles.cellInput, { color: colors.text, borderBottomColor: colors.inputBorder }]}
                     keyboardType="numeric"
-                    value={weights[ex.id]}
-                    onChangeText={(text) => handleWeightChange(ex.id, text)}
+                    value={weights[`${ex.id}_${setIdx}`]}
+                    onChangeText={(text) => handleWeightChange(ex.id, setIdx, text)}
                     placeholder="0"
                     placeholderTextColor={colors.subText}
                     maxLength={5}
@@ -181,8 +193,8 @@ export default function WorkoutInProgress({ route, navigation }) {
                 <TextInput
                   style={[styles.cellInput, { color: colors.text, borderBottomColor: colors.inputBorder }]}
                   keyboardType="numeric"
-                  value={reps[ex.id]}
-                  onChangeText={(text) => handleChange(ex.id, text)}
+                  value={reps[`${ex.id}_${setIdx}`]}
+                  onChangeText={(text) => handleChange(ex.id, setIdx, text)}
                   placeholder="0"
                   placeholderTextColor={colors.subText}
                   maxLength={3}

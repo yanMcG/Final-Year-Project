@@ -89,14 +89,19 @@ export default function ViewPreviousWorkout({ route, navigation }) {
               <Text style={[styles.tableHeader, { color: colors.subText }]}>Weight (kg)</Text>
               <Text style={[styles.tableHeader, { color: colors.subText }]}>Reps</Text>
             </View>
-            {/* Table Rows — one row per set */}
-            {Array.from({ length: ex.sets || 1 }).map((_, setIdx) => (
-              <View key={setIdx} style={styles.tableRow}>
-                <Text style={[styles.tableCell, { color: colors.text }]}>{setIdx + 1}</Text>
-                <Text style={[styles.tableCell, { color: colors.text }]}>{ex.weight || '-'}</Text>
-                <Text style={[styles.tableCell, { color: colors.text }]}>{ex.reps || 0}</Text>
-              </View>
-            ))}
+            {/* Table Rows — use per-set data if available, else fall back to flat values */}
+            {Array.from({ length: ex.sets || 1 }).map((_, setIdx) => {
+              const setEntry = Array.isArray(ex.setData) ? ex.setData[setIdx] : null;
+              const weight = setEntry ? setEntry.weight : (ex.weight || '-');
+              const repCount = setEntry ? setEntry.reps : (ex.reps || 0);
+              return (
+                <View key={setIdx} style={styles.tableRow}>
+                  <Text style={[styles.tableCell, { color: colors.text }]}>{setIdx + 1}</Text>
+                  <Text style={[styles.tableCell, { color: colors.text }]}>{weight}</Text>
+                  <Text style={[styles.tableCell, { color: colors.text }]}>{repCount}</Text>
+                </View>
+              );
+            })}
           </View>
         ))}
       </ScrollView>
