@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { addDoc, collection } from 'firebase/firestore';
 
@@ -72,6 +72,28 @@ export default function WorkoutInProgress({ route, navigation }) {
   };
 
 
+
+  // Discard the workout — clear timer and go home without saving
+  const handleDiscard = () => {
+    const doDiscard = () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      navigation.navigate('Previous Workouts');
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Are you sure you want to discard this workout? Nothing will be saved.');
+      if (confirmed) doDiscard();
+    } else {
+      Alert.alert(
+        'Discard Workout',
+        'Are you sure you want to discard this workout? Nothing will be saved.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Discard', style: 'destructive', onPress: doDiscard },
+        ]
+      );
+    }
+  };
 
   // Format seconds to mm:ss
   const formatTime = (seconds) => {
@@ -151,12 +173,7 @@ export default function WorkoutInProgress({ route, navigation }) {
           <Ionicons name="time-outline" size={20} color={colors.text} />
           <Text style={[styles.timerText, { color: colors.text }]}>{formatTime(elapsed)}</Text>
         </View>
-        <TouchableOpacity onPress={() => {
-          Alert.alert('Discard Workout', 'Are you sure you want to discard this workout?', [
-            { text: 'Cancel', style: 'cancel' },
-            { text: 'Discard', style: 'destructive', onPress: () => navigation.goBack() },
-          ]);
-        }}>
+        <TouchableOpacity onPress={handleDiscard}>
           <Ionicons name="trash-outline" size={22} color={colors.text} />
         </TouchableOpacity>
       </View>
